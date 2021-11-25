@@ -1,5 +1,5 @@
-from GeneralNodes.DataNode import DataNode
-from GeneralNodes.LocationNode import LocationNode
+from generalNodes.DataNode import DataNode
+from generalNodes.LocationNode import LocationNode
 from Utils.FractionalCascadingUtils import D, L
 
 

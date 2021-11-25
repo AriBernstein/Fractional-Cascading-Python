@@ -1,4 +1,4 @@
-from GeneralNodes.FullNode import FullNode
+from generalNodes.FullNode import FullNode
 from Utils.NodeGeneration import generate_FullNode_data_set
 from Utils.SortNodes import sort
 
