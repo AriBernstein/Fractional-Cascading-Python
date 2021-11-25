@@ -2,9 +2,9 @@ from random import sample, shuffle
 
 from Utils.FractionalCascadingExceptions import \
     InvalidRandUniqueIntGenerationInput
-from generalNodes.DataNode import DataNode
-from generalNodes.LocationNode import LocationNode
-from generalNodes.FullNode import FullNode
+from GeneralNodes.DataNode import DataNode
+from GeneralNodes.LocationNode import LocationNode
+from GeneralNodes.FullNode import FullNode
 
 
 def rand_unique_ints(

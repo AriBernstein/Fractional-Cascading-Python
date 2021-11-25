@@ -1,5 +1,5 @@
 
-from generalNodes.SingleDimNode import SingleDimNode
+from GeneralNodes.SingleDimNode import SingleDimNode
 
 
 def _merge(arr:list[SingleDimNode], l:int, m:int, r:int) -> None:
