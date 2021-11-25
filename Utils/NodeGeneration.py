@@ -3,7 +3,7 @@ from random import sample, shuffle
 from Utils.FractionalCascadingExceptions import InvalidRanUniqueIntGenerationInput
 from GeneralNodes.DataNode import DataNode
 from GeneralNodes.LocationNode import LocationNode
-from GeneralNodes.Node import Node
+from GeneralNodes.FullNode import FullNode
 
 def rand_unique_ints_in_range(
     n:int, range_min:int, range_max:int,
@@ -21,7 +21,7 @@ def rand_unique_ints_in_range(
     return ret
 
 def get_node_list(n:int, dimensionality: int, loc_min:int, loc_max:int,
-                  insert_val_one:int, insert_val_two:int) -> list[Node]:
+                  insert_val_one:int, insert_val_two:int) -> list[FullNode]:
     
     node_data_matrix = [
         rand_unique_ints_in_range(
@@ -35,7 +35,6 @@ def get_node_list(n:int, dimensionality: int, loc_min:int, loc_max:int,
         loc_dict = {}
         for i in range(1, len(node_data_set)):
             loc_dict[i] = LocationNode(node_data_set[i], i)
-        node_list.append(Node(DataNode(node_data_set[0]), loc_dict))     
+        node_list.append(FullNode(DataNode(node_data_set[0]), loc_dict))     
         
     return node_list
-    

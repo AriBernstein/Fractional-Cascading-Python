@@ -3,9 +3,9 @@ from GeneralNodes.LocationNode import LocationNode
 from GeneralNodes.SingleDimNode import SingleDimNode
 from Utils.FractionalCascadingUtils import D
 
-class Node:
+class FullNode:
     
-    def __init__(self, data:DataNode, locations:dict[LocationNode]) -> None:
+    def __init__(self, data:DataNode, locations:dict[int, LocationNode]) -> None:
         self._data = data
         self._locs = locations
         
@@ -15,7 +15,7 @@ class Node:
     def dataNode(self) -> DataNode:
         return self._data
     
-    def locations(self) -> dict[LocationNode]:
+    def locations(self) -> dict[int, LocationNode]:
         return self._locs
     
     def loc(self, dim:int) -> LocationNode:
@@ -33,8 +33,8 @@ class Node:
         return f"Data: {self._data}, Location:\n{self._locs}"
     
     def __eq__(self, __o: object) -> bool:
-        if not __o == None and isinstance(__o, Node):
-            if not self._data == Node.data():
+        if not __o == None and isinstance(__o, FullNode):
+            if not self._data == FullNode.data():
                 return False
             if not self.dimensionality() == __o.dimensionality():
                 return False
@@ -46,6 +46,6 @@ class Node:
         return False
     
     def __ne__(self, __o: object) -> bool:
-        if not __o == None and isinstance(__o, Node):
+        if not __o == None and isinstance(__o, FullNode):
             return not self.__eq__(__o)
         return False
