@@ -1,13 +1,16 @@
-from inspect import ismethod
-from typing import TypeVar, Iterable
-
-from FractionalCascadingExceptions import MissingComparisonMethodsException
+from typing import TypeVar
 
 # Generic for data and locations
 # -> Represents any data. Just a label for consistency, no rules to enforce.
 D = TypeVar('D')
 # -> Represents a given location. Instances of L must be comparable.
 L = TypeVar('L')
+
+
+
+
+
+
 
 # COMPARISON_METHOD_NAMES = \
 #     {"__eq__", "__ne__", "__gt__", "__lt__", "__ge__", "__le__"}
