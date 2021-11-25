@@ -10,3 +10,10 @@ class MissingComparisonMethodsException(Exception):
         super().__init__("In order to use this object when creating a node," + \
             " it must have the following comparison methods implemented:\n" + \
                 f"{pr_missing_methods_str}")
+        
+
+class InvalidRanUniqueIntGenerationInput(Exception):
+    def __init__(self, range_min:int, range_max:int, n:int) -> None:
+        super().__init__(
+            f"Distance between rangeMin({range_min}) and rangeMax " + \
+                f"({range_max}) is less than expected size of output list ({n}).")

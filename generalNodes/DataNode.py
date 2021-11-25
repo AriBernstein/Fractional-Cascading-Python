@@ -11,6 +11,9 @@ class DataNode:
     
     def set_data(self, data) -> None:
         self._data = data
+        
+    def __str__(self) -> str:
+        return str(self._data)
     
     def __eq__(self, __o: object) -> bool:
         if __o != None and isinstance(__o, DataNode):
