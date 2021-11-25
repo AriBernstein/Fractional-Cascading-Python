@@ -1,16 +1,14 @@
 from typing import Optional
 
 from Utils.FractionalCascadingUtils import L
-from generalNodes.DataNode import DataNode
 
 class LocationNode:
     
-    def __init__(self, location:L, data_node:DataNode, dimension:int, 
+    def __init__(self, location:L, dimension:int, 
                  dimension_label:Optional[str]=None) -> None:
         
         # check_for_comparison_meths(location)  # Raise exception if can't compare
         self._loc = location
-        self._data = data_node
         self._dim = dimension
         self._dim_label = dimension_label
     
@@ -20,8 +18,8 @@ class LocationNode:
     def set_loc(self, loc:L) -> None:
         self._loc = loc
         
-    def get_data(self) -> DataNode:
-        return self._data
+    def dim(self) -> int:
+        return self._dim
     
     def __str__(self) -> str:
         return f"({self._dim}) {self._dim_label}" if self._dim_label else str(self._dim)
