@@ -22,11 +22,11 @@ class LocationNode:
     def dim(self) -> int:
         return self._dim
     
+    def dim_str(self) -> str:
+        return self._dim_label if self._dim_label else str(self._dim)
+    
     def __str__(self) -> str:
-        if self._dim_label:
-            return f"(Dim: {self._dim_label}) Loc: {self._loc}"
-        else:
-            return f"(Dim: {self._dim}) {self._loc}"
+        return f"Dim: {self.dim_str()}, Loc: {self._loc}"
         
     def __repr__(self) -> str:
         return str(self)

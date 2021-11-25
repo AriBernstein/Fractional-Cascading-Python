@@ -28,11 +28,11 @@ class SingleDimNode:
         return f"Data: {self._data}, Location: {self._loc}"
     
     def __eq__(self, __o: object) -> bool:
-        if not __o == None and isinstance(__o, SingleDimNode):
+        if isinstance(__o, SingleDimNode):
             return __o.data() == self._data and __o.locationNode() == self._loc
         return False
     
     def __ne__(self, __o: object) -> bool:
-        if not __o == None and isinstance(__o, SingleDimNode):
+        if isinstance(__o, SingleDimNode):
             return not self.__eq__(__o)
         return False
