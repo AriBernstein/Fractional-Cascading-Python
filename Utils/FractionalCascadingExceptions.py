@@ -12,7 +12,7 @@ class MissingComparisonMethodsException(Exception):
                 f"{pr_missing_methods_str}")
         
 
-class InvalidRanUniqueIntGenerationInput(Exception):
+class InvalidRandUniqueIntGenerationInput(Exception):
     def __init__(self, range_min:int, range_max:int, n:int) -> None:
         super().__init__(
             f"Distance between rangeMin({range_min}) and rangeMax " + \

@@ -2,6 +2,7 @@ from GeneralNodes.DataNode import DataNode
 from GeneralNodes.LocationNode import LocationNode
 from GeneralNodes.SingleDimNode import SingleDimNode
 from Utils.FractionalCascadingUtils import D
+from Utils.PrettyPrintingUtils import pretty_dict
 
 class FullNode:
     
@@ -30,7 +31,11 @@ class FullNode:
         return SingleDimNode(self._data, self._locs[dim])
     
     def __str__(self) -> str:
-        return f"Data: {self._data}, Location:\n{self._locs}"
+        dict_str = pretty_dict(self._locs, range(1, self.dimensionality()))
+        return f"Data: {self._data}, Location:\n{dict_str}"
+    
+    def __repr__(self) -> str:
+        return str(self)
     
     def __eq__(self, __o: object) -> bool:
         if not __o == None and isinstance(__o, FullNode):

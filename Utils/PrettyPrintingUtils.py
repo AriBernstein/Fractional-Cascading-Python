@@ -18,3 +18,9 @@ def pretty_list(l:Iterable, opening_brace:chr='[', closing_brace:chr=']',
         ret += new_elem_str
         
     return f"{ret[:-2]}{closing_brace}" if len(l) > 0 else ret + closing_brace
+
+def pretty_dict(d:dict, key_list:list=None, left_indent_len:int=4) -> str:
+    ret = ""
+    if not key_list: key_list = d.keys
+    for k in key_list: ret += f"{' ' * left_indent_len}{k} -> {d[k]}\n"
+    return ret.rstrip()
