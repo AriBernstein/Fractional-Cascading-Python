@@ -16,11 +16,11 @@ class DataNode:
         return str(self._data)
     
     def __eq__(self, __o: object) -> bool:
-        if __o != None and isinstance(__o, DataNode):
+        if isinstance(__o, DataNode):
             return __o.data() == self._data()
         return False
     
     def __ne__(self, __o: object) -> bool:
-        if __o != None and isinstance(__o, DataNode):
+        if isinstance(__o, DataNode):
             return not self.__eq__(__o)
         return False

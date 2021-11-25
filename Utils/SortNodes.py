@@ -17,11 +17,11 @@ def _merge(arr:list[SingleDimNode], l:int, m:int, r:int) -> None:
     while i < n1 and j < n2:
         if left_arr[i].locationNode() <= right_arr[j].locationNode():
             arr[k] = left_arr[i]
-            k += 1
+            i += 1
         else:
             arr[k] = right_arr[j]
-            k += 1
-        i += 1
+            j += 1
+        k += 1
     
     # Copy remaining elements of left_arr or right_arr if any
     while i < n1:
@@ -32,7 +32,7 @@ def _merge(arr:list[SingleDimNode], l:int, m:int, r:int) -> None:
     while j < n2:
         arr[k] = right_arr[j]
         k += 1
-        i += 1
+        j += 1
     
 
 def _merge_sort(arr:list[SingleDimNode], l:int, r:int) -> None:
@@ -44,7 +44,7 @@ def _merge_sort(arr:list[SingleDimNode], l:int, r:int) -> None:
         _merge(arr, l, m, r)
         
     
-def sort(arr:list[SingleDimNode]) -> None:
-    if len(arr) <= 1:
-        _merge_sort(arr, 0, len(arr) - 1)
-        
+def sort(unsorted_arr:list[SingleDimNode]) -> None:
+    
+    if len(unsorted_arr) > 1:
+        _merge_sort(unsorted_arr, 0, len(unsorted_arr) - 1)

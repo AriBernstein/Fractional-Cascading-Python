@@ -18,3 +18,9 @@ class InvalidRandUniqueIntGenerationInput(Exception):
         super().__init__(
             f"Distance between rangeMin({range_min}) and rangeMax " + \
                 f"({range_max}) is less than expected size of output list ({n}).")
+        
+        
+class InvalidDimensionalityException(Exception):
+    def __init__(self, cur_dim:int, dimensionality:int) -> None:
+        super().__init__(f"Invalid dimensionality: {cur_dim} is either " + \
+            f"less than 1 or greater than dimensionality ({dimensionality})")

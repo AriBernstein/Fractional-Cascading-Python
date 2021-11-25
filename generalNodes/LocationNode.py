@@ -43,32 +43,32 @@ class LocationNode:
             bool: True if the location value for this object equals that of __o,
             false otherwise.
         """
-        if __o != None and isinstance(__o, LocationNode):
+        if isinstance(__o, LocationNode):
             return self._loc == __o.loc()
             
         return False
     
     def __ne__(self, __o: object) -> bool:
-        if __o != None and isinstance(__o, LocationNode):
+        if isinstance(__o, LocationNode):
             return not self.__eq__(__o)
         return False
     
     def __gt__(self, __o: object) -> bool:
-        if __o != None and isinstance(__o, LocationNode):
+        if isinstance(__o, LocationNode):
             return self._loc > __o.loc()
         return False
     
     def __lt__(self, __o: object) -> bool:
-        if __o != None and isinstance(__o, LocationNode):
+        if isinstance(__o, LocationNode):
             return self._loc < __o.loc()
         return False
     
     def __ge__(self, __o: object) -> bool:
-        if __o != None and isinstance(__o, LocationNode):
+        if isinstance(__o, LocationNode):
             return not self.__lt__(__o)
         return False
     
     def __le__(self, __o: object) -> bool:
-        if __o != None and isinstance(__o, LocationNode):
+        if isinstance(__o, LocationNode):
             return not self.__gt__(__o)
         return False
