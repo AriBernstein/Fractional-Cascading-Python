@@ -6,6 +6,7 @@ from GeneralNodes.DataNode import DataNode
 from GeneralNodes.LocationNode import LocationNode
 from GeneralNodes.FullNode import FullNode
 
+
 def rand_unique_ints(
     n:int, range_min:int, range_max:int,
     insert_one:int=None, insert_two:int=None) -> list[int]:

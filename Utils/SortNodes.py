@@ -1,6 +1,7 @@
 
 from GeneralNodes.SingleDimNode import SingleDimNode
 
+
 def _merge(arr:list[SingleDimNode], l:int, m:int, r:int) -> None:
     
     # Sizes of two subarrays to be merged
@@ -35,7 +36,6 @@ def _merge(arr:list[SingleDimNode], l:int, m:int, r:int) -> None:
     
 
 def _merge_sort(arr:list[SingleDimNode], l:int, r:int) -> None:
-    
     
     if l < r:
         m = l + (r - l) // 2

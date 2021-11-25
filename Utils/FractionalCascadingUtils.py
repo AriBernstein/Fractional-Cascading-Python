@@ -11,6 +11,10 @@ L = TypeVar('L')
 
 
 
+# TODO: MAKE THE BELOW WORK LATER - Checks to verify that any given type is
+#   orderable (comparable with instances of same class via operands:
+#       ==, != <, <=, >, >=)
+
 
 # COMPARISON_METHOD_NAMES = \
 #     {"__eq__", "__ne__", "__gt__", "__lt__", "__ge__", "__le__"}

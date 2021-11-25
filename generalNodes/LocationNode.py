@@ -2,6 +2,7 @@ from typing import Optional
 
 from Utils.FractionalCascadingUtils import L
 
+
 class LocationNode:
     
     def __init__(self, location:L, dimension:int, 

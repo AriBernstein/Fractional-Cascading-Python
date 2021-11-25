@@ -4,6 +4,7 @@ from GeneralNodes.SingleDimNode import SingleDimNode
 from Utils.FractionalCascadingUtils import D
 from Utils.PrettyPrintingUtils import pretty_dict
 
+
 class FullNode:
     
     def __init__(self, data:DataNode, locations:dict[int, LocationNode]) -> None:

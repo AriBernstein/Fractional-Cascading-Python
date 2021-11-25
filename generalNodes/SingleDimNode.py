@@ -2,6 +2,7 @@ from GeneralNodes.DataNode import DataNode
 from GeneralNodes.LocationNode import LocationNode
 from Utils.FractionalCascadingUtils import D, L
 
+
 class SingleDimNode:
     
     def __init__(self, data:DataNode, location:LocationNode) -> None:
