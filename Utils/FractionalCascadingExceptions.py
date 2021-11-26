@@ -1,4 +1,5 @@
 
+from typing import Type
 from Utils.PrettyPrintingUtils import pretty_list
 
 
@@ -24,3 +25,54 @@ class InvalidDimensionalityException(Exception):
     def __init__(self, cur_dim:int, dimensionality:int) -> None:
         super().__init__(f"Invalid dimensionality: {cur_dim} is either " + \
             f"less than 1 or greater than dimensionality ({dimensionality})")
+        
+        
+def raise_if(obj_a:object, obj_b:object, invert:bool=False,
+             exception:Type[Exception]=None, params:tuple=None) -> None:
+    """
+    Raise an exception when two given objects are equal.
+
+    Args:
+        obj_a (object): To be compared with obj_b.
+        obj_b (object): To be compared with obj_a.
+        invert (bool, optional): Defaults to False. If true, raise exception if
+            obj_a does not equal obj_b.
+        exception (Type[Exception], optional): Exception type to be raised if
+            obj_a equals obj_b. If None, use default Exception.
+        params (tuple, optional): Tuple containing parameters to be used when 
+            calling exception constructor.
+
+    Raises:
+        exception: Given exception, instantiated via values in params.
+        Exception: Default exception if None, instantiated via values in params.
+    """
+    if exception != None and not \
+        (isinstance(exception, Exception) or issubclass(exception, Exception)):
+            # Ensure that exception is of proper type.
+            raise Exception("Invalid exception param. Type must be be a " + \
+                "subclass of the Exception class.")
+        
+    if (obj_a == obj_b and not invert) or \
+        (obj_a != obj_b and invert):
+        return
+    
+    raise exception(params) if exception else Exception(params)
+
+
+def raise_if_none(obj:object, exception:Type[Exception]=None, params:tuple=None, empty_params:bool=False):
+    """
+    Raise an exception when a given object is None.
+    
+    Args:
+        obj (object): To be checked if None.
+        exception (Type[Exception], optional): Exception to be raised if obj is
+            None. If None, uses default Exception class.
+        params (tuple, optional): Tuple containing parameters to be used when 
+            calling exception constructor. If None, and empty_params is False,
+            defaults to a string message: "Object does not exist.".
+        empty_params (bool): If true, and params is None, do not instantiate 
+            exception with default messsage.    """
+    if not params and not empty_params:
+        params = (f"Object does not exist.")
+    
+    raise_if(obj_a=obj, obj_b=None, exception=exception, params=params)
