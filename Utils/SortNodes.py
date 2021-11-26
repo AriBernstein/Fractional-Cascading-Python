@@ -1,8 +1,22 @@
 
 from GeneralNodes.SingleDimNode import SingleDimNode
 
+"""
+Functions to perform an in-place merge sort on a list of SingleDimNodes. The
+resulting state of the list is in ascending order based on the values of the
+LocationNode in each SingleDimNode. """
+
 
 def _merge(arr:list[SingleDimNode], l:int, m:int, r:int) -> None:
+    """
+    Merge function for merge sort. Compare the LocationNode objects in each
+    SingleDimNode.
+
+    Args:
+        arr (list[SingleDimNode]): List of SingleDimNodes to be sorted.
+        l (int): Leftmost index of the subset in this recursive call.
+        m (int): Middle index of the subset in this recursive call.
+        r (int): Rightmost index of the subset in this recursive call.  """
     
     # Sizes of two subarrays to be merged
     n1, n2 = m - l + 1, r - m
@@ -36,6 +50,13 @@ def _merge(arr:list[SingleDimNode], l:int, m:int, r:int) -> None:
     
 
 def _merge_sort(arr:list[SingleDimNode], l:int, r:int) -> None:
+    """
+    In-place recursive merge sort.
+    
+    Args:
+        arr (list[SingleDimNode]): List of SingleDimNodes to be sorted
+        l (int): Leftmost index of the subset in this recursive call.
+        r (int): Rightmost index of the subset in this recursive call.  """
     
     if l < r:
         m = l + (r - l) // 2
@@ -45,6 +66,12 @@ def _merge_sort(arr:list[SingleDimNode], l:int, r:int) -> None:
         
     
 def sort(unsorted_arr:list[SingleDimNode]) -> None:
+    """
+    Function to sort a list of SingleDimNodes in place by their LocationNodes
+    values (ascending).
     
+    Args:
+        unsorted_arr (list[SingleDimNode]): List of SingleDimNodes to be sorted
+    """
     if len(unsorted_arr) > 1:
         _merge_sort(unsorted_arr, 0, len(unsorted_arr) - 1)
