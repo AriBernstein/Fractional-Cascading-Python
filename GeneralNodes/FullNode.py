@@ -93,13 +93,13 @@ class FullNode:
 
         Returns:
             list[SingleDimNode]: A list of n SingleDimNodes, one for each
-                location node in self._locs """
+                LocationNode in self._locs """
                 
         return [ SingleDimNode(self._data, self._locs[i]) \
-            for i in range(1, self.dimensionality() + 1) ] 
+            for i in range(1, self.dimensionality() + 1) ]
     
     def __str__(self) -> str:
-        dict_str = pretty_dict(self._locs, range(1, self.dimensionality()))
+        dict_str = pretty_dict(self._locs, range(1, self.dimensionality() + 1))
         return f"Data: {self._data}, Location:\n{dict_str}"
     
     def __repr__(self) -> str:

@@ -66,8 +66,6 @@ def generate_FullNode_data_set(
         list[FullNode]: List of n FullNode objects with randomized integer data
             and location values, all unique in their own dimensions and between
             loc_min and loc_max.    """
-            
-    dim += 1    # Account for zero-indexing
     
     node_data_matrix = [    # dim + 1 -> extra integer for data
         rand_unique_ints(n, loc_min, loc_max, insert_one, insert_two)
@@ -82,6 +80,6 @@ def generate_FullNode_data_set(
         loc_dict = {}
         for j in range(1, dim + 1):
             loc_dict[j] = LocationNode(node_data_matrix[j][i], j)
-        node_list.append(FullNode(DataNode(node_data_matrix[j][0]), loc_dict))
+        node_list.append(FullNode(DataNode(node_data_matrix[0][i]), loc_dict))
                 
     return node_list
