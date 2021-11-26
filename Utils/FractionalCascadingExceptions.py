@@ -27,6 +27,12 @@ class InvalidDimensionalityException(Exception):
             f"less than 1 or greater than dimensionality ({dimensionality})")
         
         
+class MissingFieldException(Exception):
+    def __init__(self, class_name:str, field_name:str) -> None:
+        super().__init__(
+            f"Instance of class {class_name} is missing field: {field_name}.")
+        
+        
 def raise_if(obj_a:object, obj_b:object, invert:bool=False,
              exception:Type[Exception]=None, params:tuple=None) -> None:
     """
@@ -59,7 +65,8 @@ def raise_if(obj_a:object, obj_b:object, invert:bool=False,
     raise exception(params) if exception else Exception(params)
 
 
-def raise_if_none(obj:object, exception:Type[Exception]=None, params:tuple=None, empty_params:bool=False):
+def raise_if_none(obj:object, exception:Type[Exception]=None, params:tuple=None, 
+                  empty_params:bool=False) -> None:
     """
     Raise an exception when a given object is None.
     
