@@ -10,24 +10,25 @@ if __name__ == "__main__":
     loc_max = 100
     
     fullNodes = generate_FullNode_data_set(n, dim, loc_min, loc_max)
-    for x in fullNodes:
-        print(x)
+    dim_1_list, dim_2_list, dim_3_list = [], [], []
+    for fn in fullNodes:
+        n1, n2, n3 = fn.get_SingleDimNode_list()
+        dim_1_list.append(n1)
+        dim_2_list.append(n2)
+        dim_3_list.append(n3)
     
-    # dim_1_list = [fn.get_SingleDimNode(1) for fn in fullNodes]
     
-    # for i in fullNodes:
-    #     print(i)
-        
-    # print ("------------")
-    
-    # for i in dim_1_list:
-    #     print(i)
-    
-    # print ("------------")
-        
-    # sort(dim_1_list)
-    # for i in dim_1_list:
-    #     print(i)
+    for i in fullNodes:
+        print(i)
         
     print ("------------")
     
+    for i in dim_1_list:
+        print(i)
+    
+    print ("------------")
+        
+    sort(dim_1_list)
+    for i in dim_1_list:
+        print(i)
+        

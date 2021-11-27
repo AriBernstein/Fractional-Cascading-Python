@@ -1,4 +1,3 @@
-
 from typing import Iterable
 
 
@@ -23,5 +22,29 @@ def pretty_list(l:Iterable, opening_brace:chr='[', closing_brace:chr=']',
 def pretty_dict(d:dict, key_list:list=None, left_indent_len:int=4) -> str:
     ret = ""
     if not key_list: key_list = d.keys
-    for k in key_list: ret += f"{' ' * left_indent_len}{k} -> {d[k]}\n"
+    for k in key_list: 
+        ret += f"{' ' * left_indent_len}{k} -> {d[k]}\n"
     return ret.rstrip()
+
+def pad_ints(i:int, n:int) -> str:
+    """
+    Convert integer i into string of length equal to n.
+
+    Args:
+        i (int): integer in to be converted into a string.
+        n (int): length of string output.
+
+    Raises:
+        Exception: If i has more digits than n.
+
+    Returns:
+        str: String containing integer i, front-padded to n characters. """
+    
+    i_str = str(i)
+    i_len = len(i_str)
+    
+    if i_len > n:
+        raise Exception(
+            "Int i has {i_len} digits but the maximum allowed is {n}.")
+    
+    return f"{' ' * (n - i_len)}{i_str}"
