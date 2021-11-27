@@ -1,6 +1,8 @@
+from typing import Type, Union
+
 from GeneralNodes.FullNode import FullNode
 from GeneralNodes.SingleDimNode import SingleDimNode
-
+from Utils.FractionalCascadingExceptions import InvalidTypeException, raise_if_equal
 
 
 def fullNode_list_to_SingleDimNode_matrix(
@@ -27,20 +29,28 @@ def fullNode_list_to_SingleDimNode_matrix(
     
     return ret_matrix
 
+
+############################# Merge Sort Methods ###############################
 # Functions to perform an in-place merge sort on a list of SingleDimNodes. The
 # resulting state of the list is in ascending order based on the values of the
 # LocationNode in each SingleDimNode.
 
-def _merge(arr:list[SingleDimNode], l:int, m:int, r:int) -> None:
+def _merge(arr:Union[list[SingleDimNode], list[FullNode]], 
+           l:int, m:int, r:int, dim:int=None) -> None:
     """
     Merge function for merge sort. Compare the LocationNode objects in each
     SingleDimNode.
 
     Args:
-        arr (list[SingleDimNode]): List of SingleDimNodes to be sorted.
+        arr (Union[list[SingleDimNode], list[FullNode]]): List of either
+            SingleDimNodes to be sorted on their location or FullNodes to be
+            sorted on a given dimension.
         l (int): Leftmost index of the subset in this recursive call.
         m (int): Middle index of the subset in this recursive call.
-        r (int): Rightmost index of the subset in this recursive call.  """
+        r (int): Rightmost index of the subset in this recursive call.
+        dim (int, optional): If not None, treat arr as list of FullNode 
+            instances to be sorted on this field. Otherwise treat arr as list of
+            SingleDimNodes. """
     
     # Sizes of two subarrays to be merged
     n1, n2 = m - l + 1, r - m
@@ -53,7 +63,8 @@ def _merge(arr:list[SingleDimNode], l:int, m:int, r:int) -> None:
     i = j = 0
     k = l
     while i < n1 and j < n2:
-        if left_arr[i].locationNode() <= right_arr[j].locationNode():
+        if (not dim and left_arr[i].locationNode() <= right_arr[j].locationNode()) or \
+            (dim and left_arr[i].loc(dim) <= right_arr[j].loc(dim)):
             arr[k] = left_arr[i]
             i += 1
         else:
@@ -73,29 +84,51 @@ def _merge(arr:list[SingleDimNode], l:int, m:int, r:int) -> None:
         j += 1
     
 
-def _merge_sort(arr:list[SingleDimNode], l:int, r:int) -> None:
+def _merge_sort(arr:Union[list[SingleDimNode], list[FullNode]],
+                l:int, r:int, dim:int=None) -> None:
     """
     In-place recursive merge sort.
     
     Args:
-        arr (list[SingleDimNode]): List of SingleDimNodes to be sorted
+        arr (Union[list[SingleDimNode], list[FullNode]]): List of either
+            SingleDimNodes to be sorted on their location or FullNodes to be
+            sorted on a given dimension.
         l (int): Leftmost index of the subset in this recursive call.
-        r (int): Rightmost index of the subset in this recursive call.  """
+        r (int): Rightmost index of the subset in this recursive call.
+        dim (int, optional): If not None, treat arr as list of FullNode 
+            instances to be sorted on this field. Otherwise treat arr as list of
+            SingleDimNodes. """
     
+    if dim != None: # Ensure that arr is a list of FullNodes
+        raise_if_equal(obj_a=type(arr[0]), obj_b=FullNode, invert=True, 
+                       exception=InvalidTypeException, 
+                       params=(type(arr[0]), "FullNode", "_merge_sort"))
+        
     if l < r:
         m = l + (r - l) // 2
-        _merge_sort(arr, l, m)
-        _merge_sort(arr, m + 1, r)
-        _merge(arr, l, m, r)
+        _merge_sort(arr, l, m, dim)
+        _merge_sort(arr, m + 1, r, dim)
+        _merge(arr, l, m, r, dim)
         
     
-def sort(unsorted_arr:list[SingleDimNode]) -> None:
+def sort_SingleDimNodes(unsorted_arr:list[SingleDimNode]) -> None:
     """
-    Function to sort a list of SingleDimNodes in place by their LocationNodes
-    values (ascending).
+    Sort a list of SingleDimNodes in place by their LocationNode values.
     
     Args:
         unsorted_arr (list[SingleDimNode]): List of SingleDimNodes to be sorted
     """
     if len(unsorted_arr) > 1:
         _merge_sort(unsorted_arr, 0, len(unsorted_arr) - 1)
+
+
+def sort_FullNodes(unsorted_arr:list[FullNode], dimension:int) -> None:
+    """
+    Sort a list of SingleDimNodes in place by their LocationNode values.
+    
+    Args:
+        unsorted_arr (list[FullNode]): List of SingleDimNodes to be sorted.
+        dimension (int): The dimension on which to sort unsorted_arr.   """
+        
+    if len(unsorted_arr) > 1:
+        _merge_sort(unsorted_arr, 0, len(unsorted_arr) - 1, dimension)

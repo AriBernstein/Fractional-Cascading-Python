@@ -33,8 +33,14 @@ class MissingFieldException(Exception):
             f"Instance of class {class_name} is missing field: {field_name}.")
         
         
-def raise_if(obj_a:object, obj_b:object, invert:bool=False,
-             exception:Type[Exception]=None, params:tuple=None) -> None:
+class InvalidTypeException(Exception):
+    def __init__(self, given_type:str, expected_type:str, owner:str) -> None:
+        super().__init__(f"Object or method {owner} is of type " + \
+            f"{given_type} when {expected_type} is expected")
+        
+        
+def raise_if_equal(obj_a:object, obj_b:object, invert:bool=False,
+                   exception:Type[Exception]=None, params:tuple=None) -> None:
     """
     Raise an exception when two given objects are equal.
 
@@ -82,4 +88,4 @@ def raise_if_none(obj:object, exception:Type[Exception]=None, params:tuple=None,
     if not params and not empty_params:
         params = (f"Object does not exist.")
     
-    raise_if(obj_a=obj, obj_b=None, exception=exception, params=params)
+    raise_if_equal(obj_a=obj, obj_b=None, exception=exception, params=params)
