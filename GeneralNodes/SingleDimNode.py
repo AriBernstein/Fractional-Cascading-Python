@@ -1,6 +1,6 @@
 from GeneralNodes.DataNode import DataNode
 from GeneralNodes.LocationNode import LocationNode
-from Utils.FractionalCascadingUtils import D, L
+from Utils.TypeUtils import D, L
 
 
 class SingleDimNode:

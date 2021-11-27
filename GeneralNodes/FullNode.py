@@ -1,7 +1,7 @@
 from GeneralNodes.DataNode import DataNode
 from GeneralNodes.LocationNode import LocationNode
 from GeneralNodes.SingleDimNode import SingleDimNode
-from Utils.FractionalCascadingUtils import D
+from Utils.TypeUtils import D
 from Utils.PrettyPrintingUtils import pretty_dict
 from Utils.FractionalCascadingExceptions import InvalidDimensionalityException
 

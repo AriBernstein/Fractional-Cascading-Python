@@ -1,7 +1,7 @@
 from GeneralNodes.DataNode import DataNode
 from GeneralNodes.LocationNode import LocationNode
 from GeneralNodes.SingleDimNode import SingleDimNode
-from Utils.FractionalCascadingUtils import D, L
+from Utils.TypeUtils import D, L
 from Utils.FractionalCascadingExceptions import MissingFieldException, raise_if_none
 
 class RangeTreeNode:
@@ -60,24 +60,26 @@ class RangeTreeNode:
     def is_leaf(self) -> bool:
         return self._l_child == None and self._r_child == None
     
-    def get_leaves(
-        self, leaf_list:list['RangeTreeNode']=[]) -> list['RangeTreeNode']:
+    def leaves(self, leaf_list:list['RangeTreeNode']=[]) -> list['RangeTreeNode']:
         """
         Recursive DFS to return all of the leaves in this subtree.
 
+        Args:
+            leaf_list (list[RangeTreeNode]): List of leaves seen so far to be
+                passed between recursive calls.
+
         Returns:
             list['RangeTreeNode']: List of RangeTreeNodes that are leaves of
-                this subtree.
-        """
+                this subtree.   """
         
         if self.is_leaf():
             return [self]
         
         if self._l_child:
-            leaf_list.extend(self._l_child.get_leaves(leaf_list))
+            leaf_list.extend(self._l_child.leaves(leaf_list))
             
         if self._r_child:
-            leaf_list.extend(self._r_child.get_leaves(leaf_list))
+            leaf_list.extend(self._r_child.leaves(leaf_list))
         
         return leaf_list
     
