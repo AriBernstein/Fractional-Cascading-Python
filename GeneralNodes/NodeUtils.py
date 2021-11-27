@@ -2,7 +2,9 @@ from typing import Type, Union
 
 from GeneralNodes.FullNode import FullNode
 from GeneralNodes.SingleDimNode import SingleDimNode
-from Utils.FractionalCascadingExceptions import InvalidDimensionalityException, InvalidInputException, InvalidTypeException, MissingParameterException, raise_if_different_types
+from Utils.FractionalCascadingExceptions import InvalidDimensionalityException, \
+    InvalidInputException, InvalidTypeException, MissingParameterException, \
+        raise_if_different_types
 
 
 def fullNode_list_to_SingleDimNode_matrix(
@@ -105,14 +107,14 @@ def _merge_lists(
         j += 1
     
 
-def _merge_sort(arr:Union[list[SingleDimNode], list[FullNode]],
+def _merge_sort(arr:Union[list[SingleDimNode], list[FullNode], list[list[SingleDimNode]]],
                 l:int, r:int, mode:int=None, dim:int=None) -> None:
     """
     In-place recursive merge sort.
     
     Args:
-        arr (Union[list[SingleDimNode], list[list[SingleDimNode]],
-            list[FullNode]]):
+        arr (Union[list[SingleDimNode], list[FullNode], 
+             list[list[SingleDimNode]]):
                 List of SingleDimNodes to be sorted on their location, list of
                 FullNodes to be sorted on a given dimension, or a Matrix of
                 SingleDimNodes to be sorted on a given dimension.
@@ -120,8 +122,8 @@ def _merge_sort(arr:Union[list[SingleDimNode], list[FullNode]],
         r (int): Rightmost index of the subset in this recursive call.
         mode (int): Correlates with one of the three types expected by arr.
             1 -> list[SingleDimNode]
-            2 -> list[list[SingleDimNode]]
-            3 -> list[FullNode]]
+            2 -> list[FullNode]]
+            3 -> list[list[SingleDimNode]]
         dim (int, optional): If not None, treat arr as list of FullNode 
             instances to be sorted on this field. Otherwise treat arr as list of
             SingleDimNodes. """
@@ -135,7 +137,6 @@ def _merge_sort(arr:Union[list[SingleDimNode], list[FullNode]],
             obj=arr[0], expected_type=FullNode, exception=InvalidTypeException, 
             params=[type(arr[0]), FullNode, "_merge_sort"])
 
-        
     if l < r:
         m = l + (r - l) // 2
         _merge_sort(arr, l, m, mode, dim)
