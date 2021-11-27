@@ -2,7 +2,7 @@ from typing import Type, Union
 
 from GeneralNodes.FullNode import FullNode
 from GeneralNodes.SingleDimNode import SingleDimNode
-from Utils.FractionalCascadingExceptions import InvalidDimensionalityException, InvalidInputException, InvalidTypeException, MissingParameterException, raise_if_equal
+from Utils.FractionalCascadingExceptions import InvalidDimensionalityException, InvalidInputException, InvalidTypeException, MissingParameterException, raise_if_different_types
 
 
 def fullNode_list_to_SingleDimNode_matrix(
@@ -76,6 +76,7 @@ def _merge_lists(
     while i < n1 and j < n2:
         
         # Compare based on input:
+        # -> Get comparison weights
         if mode == 1:
             left_weight, right_weight = \
                 left_arr[i].locationNode(), right_arr[j].locationNode()
@@ -83,6 +84,7 @@ def _merge_lists(
             left_weight, right_weight = \
                 left_arr[i].loc(dim), right_arr[j].loc(dim)
             
+        # -> Compare comparison weights
         if (left_weight <= right_weight):
             arr[k] = left_arr[i]
             i += 1
@@ -104,7 +106,7 @@ def _merge_lists(
     
 
 def _merge_sort(arr:Union[list[SingleDimNode], list[FullNode]],
-                l:int, r:int, mode:int, dim:int=None) -> None:
+                l:int, r:int, mode:int=None, dim:int=None) -> None:
     """
     In-place recursive merge sort.
     
@@ -129,14 +131,15 @@ def _merge_sort(arr:Union[list[SingleDimNode], list[FullNode]],
             "mode", mode, "between 1 and 3 (inclusive)", _merge_sort)
     
     if dim != None: # Ensure that arr is a list of FullNodes
-        raise_if_equal(obj_a=type(arr[0]), obj_b=FullNode, invert=True, 
-                       exception=InvalidTypeException, 
-                       params=(type(arr[0]), "FullNode", "_merge_sort"))
+        raise_if_different_types(
+            obj=arr[0], expected_type=FullNode, exception=InvalidTypeException, 
+            params=[type(arr[0]), FullNode, "_merge_sort"])
+
         
     if l < r:
         m = l + (r - l) // 2
-        _merge_sort(arr, l, m, dim)
-        _merge_sort(arr, m + 1, r, dim)
+        _merge_sort(arr, l, m, mode, dim)
+        _merge_sort(arr, m + 1, r, mode, dim)
 
         if 0 < mode < 3:    # Mode is 1 or 2
             _merge_lists(arr, l, m, r, mode, dim)
@@ -167,7 +170,7 @@ def sort_FullNode_list(unsorted_arr:list[FullNode], dimension:int) -> None:
             raise InvalidDimensionalityException(
                 dimension, unsorted_arr[0].dimensionality())
         
-        _merge_sort(unsorted_arr, 0, len(unsorted_arr) - 1, 3, dimension)
+        _merge_sort(unsorted_arr, 0, len(unsorted_arr) - 1, 2, dimension)
         
 
 # def sort_SingleDimNode_matrix(
