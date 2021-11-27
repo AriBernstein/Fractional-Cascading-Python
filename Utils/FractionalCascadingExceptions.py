@@ -28,15 +28,28 @@ class InvalidDimensionalityException(Exception):
         
         
 class MissingFieldException(Exception):
-    def __init__(self, class_name:str, field_name:str) -> None:
+    def __init__(self, class_name:str, field_name:str, further_msg:str=None) -> None:
         super().__init__(
-            f"Instance of class {class_name} is missing field: {field_name}.")
+            f"Instance of class {class_name} is missing field: {field_name}" + \
+                f". {'' if not further_msg else further_msg}")
+        
+class MissingParameterException(Exception):
+    def __init__(self, method_name:str, param_name:str, further_msg:str=None) -> None:
+        super().__init__(
+            f"Method {method_name} is missing parameter: {param_name}" + \
+                f". {'' if not further_msg else further_msg}")
         
         
 class InvalidTypeException(Exception):
     def __init__(self, given_type:str, expected_type:str, owner:str) -> None:
         super().__init__(f"Object or method {owner} is of type " + \
             f"{given_type} when {expected_type} is expected")
+        
+        
+class InvalidInputException(Exception):
+    def __init__(self, field_name:str, given_val:str, expected_val:str, owner:str) -> None:
+        super().__init__(f"Object or method {owner} expected {field_name}" + \
+            f" to be {expected_val} when {given_val} was given.")
         
         
 def raise_if_equal(obj_a:object, obj_b:object, invert:bool=False,
