@@ -53,7 +53,8 @@ class InvalidInputException(Exception):
         
         
 def raise_if_equal(obj_a:object, obj_b:object, invert:bool=False,
-                   exception:Type[Exception]=None, params:tuple=None) -> None:
+                   exception:Type[Exception]=None, params:list=None,
+                   type_comparison:bool=False) -> None:
     """
     Raise an exception when two given objects are equal.
 
@@ -64,8 +65,9 @@ def raise_if_equal(obj_a:object, obj_b:object, invert:bool=False,
             obj_a does not equal obj_b.
         exception (Type[Exception], optional): Exception type to be raised if
             obj_a equals obj_b. If None, use default Exception.
-        params (tuple, optional): Tuple containing parameters to be used when 
+        params (list, optional): List containing parameters to be used when 
             calling exception constructor.
+        type_comparison (bool): If true, use is_instance instead of equality.
 
     Raises:
         exception: Given exception, instantiated via values in params.
@@ -76,12 +78,22 @@ def raise_if_equal(obj_a:object, obj_b:object, invert:bool=False,
             # Ensure that exception is of proper type.
             raise Exception("Invalid exception param. Type must be be a " + \
                 "subclass of the Exception class.")
+    
+    if type_comparison and ((isinstance(obj_a, obj_b) and invert) or \
+        (not isinstance(obj_a, obj_b) and not invert)):
+        return
         
     if (obj_a == obj_b and not invert) or \
         (obj_a != obj_b and invert):
         return
     
-    raise exception(params) if exception else Exception(params)
+    raise exception(*params) if exception else Exception(*params)
+
+
+def raise_if_different_types(obj:object, expected_type:type, 
+                             exception:Type[Exception]=None, 
+                             params:list=None) -> None:
+    raise_if_equal(obj, expected_type, True, exception, params, True)
 
 
 def raise_if_none(obj:object, exception:Type[Exception]=None, params:tuple=None, 
