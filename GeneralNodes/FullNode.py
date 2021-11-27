@@ -86,7 +86,7 @@ class FullNode:
         """
         return SingleDimNode(self._data, self.loc(d))
     
-    def get_SingleDimNode_list(self) -> list[SingleDimNode]:
+    def to_SingleDimNode_list(self) -> list[SingleDimNode]:
         """
         Convert data stored in this FullNode object into a list of
         SingleDimNodes.

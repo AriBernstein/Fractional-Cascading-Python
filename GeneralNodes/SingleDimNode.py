@@ -25,7 +25,10 @@ class SingleDimNode:
         return self._loc
     
     def __str__(self) -> str:
-        return f"Data: {self._data}, {self._loc}"
+        return f"(Data: {self._data}, {self._loc})"
+    
+    def __repr__(self) -> str:
+        return str(self)
     
     def __eq__(self, __o: object) -> bool:
         if isinstance(__o, SingleDimNode):

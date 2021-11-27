@@ -1,4 +1,4 @@
-from Utils.FractionalCascadingUtils import D
+from Utils.TypeUtils import D
 
 
 class DataNode:

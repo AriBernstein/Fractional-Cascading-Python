@@ -1,10 +1,35 @@
 from GeneralNodes.FullNode import FullNode
 from GeneralNodes.SingleDimNode import SingleDimNode
 
-"""
-Functions to perform an in-place merge sort on a list of SingleDimNodes. The
-resulting state of the list is in ascending order based on the values of the
-LocationNode in each SingleDimNode. """
+
+
+def fullNode_list_to_SingleDimNode_matrix(
+    data_set:list[FullNode]) -> list[list[SingleDimNode]]:
+    """
+    Given a data set represented as a list of FullNodes, convert it into a
+    matrix of SingleDimNodes.
+    -> Each second-dimensional list represents a single dimension.
+    -> Matrix[dimension][SingleDimNode] 
+    
+    Args:
+        data_set (list[FullNode]): K-Dimensional data set represented as a list
+            of n FullNodes.
+    Returns:
+        list[list[SingleDimNode]]: Matrix of SingleDimNodes st each
+            second-dimension list represents a given dimension. """
+    
+    ret_matrix = [[None for _ in range(len(data_set))] \
+        for _ in range(data_set[0].dimensionality())]
+    
+    for i, full_node in enumerate(data_set):
+        for j, single_dim_node in enumerate(full_node.to_SingleDimNode_list()):
+            ret_matrix[j][i] = single_dim_node
+    
+    return ret_matrix
+
+# Functions to perform an in-place merge sort on a list of SingleDimNodes. The
+# resulting state of the list is in ascending order based on the values of the
+# LocationNode in each SingleDimNode.
 
 def _merge(arr:list[SingleDimNode], l:int, m:int, r:int) -> None:
     """

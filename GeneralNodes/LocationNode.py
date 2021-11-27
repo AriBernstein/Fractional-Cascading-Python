@@ -1,6 +1,6 @@
 from typing import Optional
 
-from Utils.FractionalCascadingUtils import L
+from Utils.TypeUtils import L
 
 
 class LocationNode:
