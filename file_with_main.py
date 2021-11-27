@@ -1,6 +1,5 @@
-from GeneralNodes.FullNode import FullNode
+from GeneralNodes.NodeUtils import sort
 from Utils.NodeGeneration import generate_FullNode_data_set
-from Utils.SortNodes import sort
 
 if __name__ == "__main__":
     # print(rand_unique_ints(10, 10, 20))
