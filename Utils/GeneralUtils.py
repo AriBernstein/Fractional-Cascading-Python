@@ -1,5 +1,29 @@
 from typing import Iterable, Iterator, List
 
+class StringContainer:
+    
+    def __init__(self, initial_str:str="") -> None:
+        self._str = initial_str
+        self._i = 0
+    
+    def append(self, new_str:str):
+        self._str += new_str
+    
+    def __iter__(self) -> Iterator:
+        return self
+    
+    def __next__(self) -> chr:
+        if self._i < len(self._str):
+            self._i += 1
+            return self._str[self._i - 1]
+        raise StopIteration
+    
+    def __str__(self) -> str:
+        return self._str
+    
+    def __repr__(self) -> str:
+        return str(self)
+    
 
 class ColIterator:
     """
@@ -19,8 +43,7 @@ class ColIterator:
         if self._i < len(self._matrix):
             self._i += 1
             return self._matrix[self._i - 1][self._j]
-        else:
-            raise StopIteration
+        raise StopIteration
         
 
 def matrix_subset(matrix:Iterator[Iterator[object]], 
