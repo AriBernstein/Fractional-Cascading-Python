@@ -45,4 +45,6 @@ class RangeTree:
         self._root = self._build_range_tree(
             fullNode_list_to_SingleDimNode_matrix(data_set),
             1, sort=True)
-        
+    
+    def root(self):
+        return self._root
