@@ -37,12 +37,62 @@ def fullNode_list_to_SingleDimNode_matrix(
 # resulting state of the list is in ascending order based on the values of the
 # LocationNode in each SingleDimNode.
 
+def _merge_matrices(matrix: list[list[SingleDimNode]],
+                    l:int, m:int, r:int, dim:int=None) -> None:
+    """
+    Merge function for merge sort. Compare the LocationNode objects in each
+    SingleDimNode of dimension dim.
+
+    Args:
+        matrix (list[list[SingleDimNode]]): Matrix of SingleDimNodes w/ 
+            each second-dimension list representing a given dimension.
+        l (int): Leftmost index of the subset in this recursive call.
+        m (int): Middle index of the subset in this recursive call.
+        r (int): Rightmost index of the subset in this recursive call.    
+        d (int, optional): If not None, treat arr as list of FullNode instances
+            to be sorted on this field. Otherwise treat arr as list of
+            SingleDimNodes. """
+            
+    n_dims = len(matrix)    # Number of dimensions.
+    
+    # Sizes of two second-dimensional subarrays to be merged
+    n1, n2 = m - l + 1, r - m
+
+    # Temp arrays
+    l_subset = [[matrix[d][l + i] for i in range(n1)] for d in range(n_dims)]
+    r_subset = [[matrix[d][m + 1 + j] for j in range(n2)] for d in range(n_dims)]
+        
+    # Merge temp arrays
+    i = j = 0
+    k = l
+    
+    while i < n1 and j < n2:
+        if (l_subset[dim - 1][i].locationNode() <= r_subset[dim - 1][j].locationNode()):
+            for d in range(n_dims): matrix[d][k] = l_subset[d][i]
+            i += 1
+        else:
+            for d in range(n_dims): matrix[d][k] = r_subset[d][j]
+            j += 1
+        k += 1
+    
+    # Copy remaining elements of left_matrix or right_matrix if any
+    while i < n1:
+        for d in range(n_dims): matrix[d][k] = l_subset[d][i]
+        k += 1
+        i += 1
+        
+    while j < n2:
+        for d in range(n_dims): matrix[d][k] = r_subset[d][j]
+        k += 1
+        j += 1
+
+
 def _merge_lists(
     arr:Union[list[SingleDimNode], list[FullNode]], 
     l:int, m:int, r:int, mode:int, dim:int=None) -> None:
     """
     Merge function for merge sort. Compare the LocationNode objects in each
-    SingleDimNode.
+    SingleDimNode or the LocationNode objects in each FullNode at dimension dim.
 
     Args:
         arr (Union[list[SingleDimNode], list[FullNode]]): List of SingleDimNodes
@@ -142,10 +192,10 @@ def _merge_sort(arr:Union[list[SingleDimNode], list[FullNode], list[list[SingleD
         _merge_sort(arr, l, m, mode, dim)
         _merge_sort(arr, m + 1, r, mode, dim)
 
-        if 0 < mode < 3:    # Mode is 1 or 2
+        if mode == 1 or mode == 2:
             _merge_lists(arr, l, m, r, mode, dim)
-        # else:
-        #     _merge_matrices(arr, l, m, r)
+        else:
+            _merge_matrices(arr, l, m, r, dim)
             
 def sort_SingleDimNode_list(unsorted_arr:list[SingleDimNode]) -> None:
     """
@@ -174,20 +224,20 @@ def sort_FullNode_list(unsorted_arr:list[FullNode], dimension:int) -> None:
         _merge_sort(unsorted_arr, 0, len(unsorted_arr) - 1, 2, dimension)
         
 
-# def sort_SingleDimNode_matrix(
-#     unsorted_matrix:list[list[SingleDimNode]], dimension:int) -> None:
-#     """
-#     Sort a matrix of SingleDimNodes in place by their LocationNode values in a 
-#     given dimension.
+def sort_SingleDimNode_matrix(
+    unsorted_matrix:list[list[SingleDimNode]], dimension:int) -> None:
+    """
+    Sort a matrix of SingleDimNodes in place by their LocationNode values in a 
+    given dimension.
     
-#     Args:
-#         unsorted_matrix (list[list[SingleDimNode]]): Matrix of SingleDimNodes to
-#             be sorted on a given dimension.
-#         dimension (int): The dimension on which to sort unsorted_matrix.    """
+    Args:
+        unsorted_matrix (list[list[SingleDimNode]]): Matrix of SingleDimNodes to
+            be sorted on a given dimension.
+        dimension (int): The dimension on which to sort unsorted_matrix.    """
     
-#     if not 0 < dimension <= len(unsorted_matrix):
-#         raise InvalidDimensionalityException(dimension, len(unsorted_matrix))
+    if not 0 < dimension <= len(unsorted_matrix):
+        raise InvalidDimensionalityException(dimension, len(unsorted_matrix))
     
-#     if len(unsorted_matrix) > 1 and len(len(unsorted_matrix[0])) > 1:
-#         _merge_sort(unsorted_matrix, 0, len(unsorted_matrix[0]), 2, dimension)
+    if len(unsorted_matrix) > 1 and len(unsorted_matrix[0]) > 1:
+        _merge_sort(unsorted_matrix, 0, len(unsorted_matrix[0]) - 1, 3, dimension)
   
