@@ -1,15 +1,21 @@
-from GeneralNodes.NodeUtils import fullNode_list_to_SingleDimNode_matrix, sort_SingleDimNode_list, sort_FullNode_list, sort_SingleDimNode_matrix
+from GeneralNodes.NodeUtils import fullNode_list_to_SingleDimNode_matrix, \
+    sort_SingleDimNode_list, sort_FullNode_list, sort_SingleDimNode_matrix
 from GeneralNodes.NodeGenerationUtils import generate_FullNode_data_set
+from Utils.GeneralUtils import ColIterator, matrix_subset
+from RangeTree.RangeTree import RangeTree
 
 
 if __name__ == "__main__":
     # print(rand_unique_ints(10, 10, 20))
-    n = 10
+    n = 11
     dim = 3
     loc_min = 0
     loc_max = 100
     
-    fullNodes = generate_FullNode_data_set(n, dim, loc_min, loc_max)
+    full_nodes = generate_FullNode_data_set(n, dim, loc_min, loc_max)
+    rt = RangeTree(full_nodes, dim)
+    
+    
     # for i in fullNodes:
     #     print(i)
         
@@ -49,14 +55,22 @@ if __name__ == "__main__":
         
     # print ("------------")
     
-    node_matrix = fullNode_list_to_SingleDimNode_matrix(fullNodes)
-    for i in node_matrix:
-        print(i)
+    # node_matrix = fullNode_list_to_SingleDimNode_matrix(fullNodes)
+    
+    # for i in node_matrix:
+    #     print(i)
+    
+    # print ("------------")
+   
+    
+    # for x in ColIterator(node_matrix, 4):
+    #     print(x)  
         
-    sort_SingleDimNode_matrix(node_matrix, 3)
+    # for x in matrix_subset(node_matrix, 2, 6):
+    #     print(x)
     
-    print ("------------")
+    # sort_SingleDimNode_matrix(node_matrix, 3)
+     
     
-    
-    for i in node_matrix:
-        print(i)
+    # for i in node_matrix:
+    #     print(i)
