@@ -1,5 +1,7 @@
 from typing import Iterable, Iterator, List
 
+from Utils.CustomExceptions import InvalidTypeException
+
 class StringContainer:
     
     def __init__(self, initial_str:str="") -> None:
@@ -23,6 +25,16 @@ class StringContainer:
     
     def __repr__(self) -> str:
         return str(self)
+    
+    def __iadd__(self, __o:object) -> None:
+        if isinstance(__o, str) or isinstance(__o, chr):
+            self._str += __o
+        elif isinstance(__o, StringContainer):
+            self._str += str(__o)
+        else:
+            raise InvalidTypeException(
+                type(__o), "str or StringContainer", "StringContainer -> +=")
+        return self
     
 
 class ColIterator:
