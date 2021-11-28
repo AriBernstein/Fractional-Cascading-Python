@@ -1,6 +1,8 @@
+from typing import Union
 from GeneralNodes.DataNode import DataNode
 from GeneralNodes.LocationNode import LocationNode
 from GeneralNodes.SingleDimNode import SingleDimNode
+from Utils.GeneralUtils import pretty_list
 from Utils.TypeUtils import D, L
 from Utils.CustomExceptions import MissingFieldException, raise_if_none
 
@@ -72,7 +74,31 @@ class RangeTreeNode:
     def is_leaf(self) -> bool:
         return self._l_child == None and self._r_child == None
     
-    def leaves(self, leaf_list:list['RangeTreeNode']=[]) -> list['RangeTreeNode']:
+    def leaves(self, leaf_list:list['RangeTreeNode']=[], locations:bool=False
+                ) -> Union[list['RangeTreeNode'], list[LocationNode]]:
+        """
+        Recursive DFS to return all of the leaves in this subtree.
+
+        Args:
+            leaf_list (list[RangeTreeNode]): List of leaves seen so far to be
+                passed between recursive calls.
+
+        Returns:
+            list['RangeTreeNode']: List of RangeTreeNodes that are leaves of
+                this subtree.   """
+        if self.is_leaf():
+            return [self] if not locations else [self.get_locationNode()]
+        
+        if self._l_child:
+            leaf_list.extend(self._l_child.leaves_locations(leaf_list))
+            
+        if self._r_child:
+            leaf_list.extend(self._r_child.leaves_locations(leaf_list))
+        
+        return leaf_list
+    
+
+    def leaves_locations(self, leaf_list:list[LocationNode]=[]) -> list[LocationNode]:
         """
         Recursive DFS to return all of the leaves in this subtree.
 
@@ -85,15 +111,37 @@ class RangeTreeNode:
                 this subtree.   """
         
         if self.is_leaf():
-            return [self]
+            return [self.get_locationNode()]
         
         if self._l_child:
-            leaf_list.extend(self._l_child.leaves(leaf_list))
+            leaf_list.extend(self._l_child.leaves_locations(leaf_list))
             
         if self._r_child:
-            leaf_list.extend(self._r_child.leaves(leaf_list))
+            leaf_list.extend(self._r_child.leaves_locations(leaf_list))
         
         return leaf_list
+    
+    
+    def lower_dim_locations(self) -> list[LocationNode]:
+        locs = [self.get_locationNode()]
+        next_dim_r = self.next_dimension_subtree()
+        while next_dim_r != None:
+            locs.append(next_dim_r.get_locationNode())
+            next_dim_r = next_dim_r.next_dimension_subtree()
+        return locs
+        
+    def visualizer_str(self, print_str=False) -> str:
+        ret = f"[{str(self)}]"
+        
+        if self.is_leaf():
+            return f"{ret} - {self.lower_dim_locations()}"
+        
+        ret += f" {pretty_list(self.lower_dim_locations(), '(', ')')}"
+        
+        if print_str:
+            print(ret)
+            
+        return ret
     
     def __str__(self) -> str:
         return str(self._node_info)
