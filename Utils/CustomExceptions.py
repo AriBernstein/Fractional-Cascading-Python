@@ -1,6 +1,6 @@
 
 from typing import Type
-from Utils.PrettyPrintingUtils import pretty_list
+from Utils.GeneralUtils import pretty_list
 
 
 class MissingComparisonMethodsException(Exception):
@@ -24,26 +24,26 @@ class InvalidRandUniqueIntGenerationInput(Exception):
 class InvalidDimensionalityException(Exception):
     def __init__(self, cur_dim:int, dimensionality:int) -> None:
         super().__init__(f"Invalid dimensionality: {cur_dim} is either " + \
-            f"less than 1 or greater than dimensionality ({dimensionality})")
+            f"less than 1 or greater than dimensionality ({dimensionality}).")
         
         
 class MissingFieldException(Exception):
     def __init__(self, class_name:str, field_name:str, further_msg:str=None) -> None:
         super().__init__(
             f"Instance of class {class_name} is missing field: {field_name}" + \
-                f". {'' if not further_msg else further_msg}")
+                f". {'' if not further_msg else further_msg}.")
         
 class MissingParameterException(Exception):
     def __init__(self, method_name:str, param_name:str, further_msg:str=None) -> None:
         super().__init__(
             f"Method {method_name} is missing parameter: {param_name}" + \
-                f". {'' if not further_msg else further_msg}")
+                f". {'' if not further_msg else further_msg}.")
         
         
 class InvalidTypeException(Exception):
     def __init__(self, given_type:str, expected_type:str, owner:str) -> None:
         super().__init__(f"Object or method {owner} is of type " + \
-            f"{given_type} when {expected_type} is expected")
+            f"{given_type} when {expected_type} is expected.")
         
         
 class InvalidInputException(Exception):

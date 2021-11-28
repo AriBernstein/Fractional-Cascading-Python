@@ -2,7 +2,7 @@ from GeneralNodes.DataNode import DataNode
 from GeneralNodes.LocationNode import LocationNode
 from GeneralNodes.SingleDimNode import SingleDimNode
 from Utils.TypeUtils import D, L
-from Utils.FractionalCascadingExceptions import MissingFieldException, raise_if_none
+from Utils.CustomExceptions import MissingFieldException, raise_if_none
 
 class RangeTreeNode:
     

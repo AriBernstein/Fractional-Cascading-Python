@@ -2,8 +2,8 @@ from GeneralNodes.DataNode import DataNode
 from GeneralNodes.LocationNode import LocationNode
 from GeneralNodes.SingleDimNode import SingleDimNode
 from Utils.TypeUtils import D
-from Utils.PrettyPrintingUtils import pretty_dict
-from Utils.FractionalCascadingExceptions import InvalidDimensionalityException
+from Utils.GeneralUtils import pretty_dict
+from Utils.CustomExceptions import InvalidDimensionalityException
 
 class FullNode:
     """

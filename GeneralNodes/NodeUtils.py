@@ -1,8 +1,8 @@
-from typing import Type, Union
+from typing import Union
 
 from GeneralNodes.FullNode import FullNode
 from GeneralNodes.SingleDimNode import SingleDimNode
-from Utils.FractionalCascadingExceptions import InvalidDimensionalityException, \
+from Utils.CustomExceptions import InvalidDimensionalityException, \
     InvalidInputException, InvalidTypeException, MissingParameterException, \
         raise_if_different_types
 

@@ -1,7 +1,6 @@
 from random import sample, shuffle
 
-from Utils.FractionalCascadingExceptions import \
-    InvalidRandUniqueIntGenerationInput
+from Utils.CustomExceptions import InvalidRandUniqueIntGenerationInput
 from GeneralNodes.DataNode import DataNode
 from GeneralNodes.LocationNode import LocationNode
 from GeneralNodes.FullNode import FullNode
