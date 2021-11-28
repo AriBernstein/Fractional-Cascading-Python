@@ -6,9 +6,21 @@ from Utils.CustomExceptions import MissingFieldException, raise_if_none
 
 class RangeTreeNode:
     
-    def __init__(self, node_info:SingleDimNode):
+    def __init__(self, node_info:SingleDimNode, 
+                 left_child:'RangeTreeNode'=None,
+                 right_child:'RangeTreeNode'=None,
+                 next_dimension_subtree:'RangeTreeNode'=None) -> None:
         self._node_info = node_info
-        self._p = self._l_child = self._r_child = self._next_dim_subtree = None
+        self._next_dim_subtree = next_dimension_subtree
+        self._l_child = left_child
+        if left_child:
+            self._l_child.set_parent(self)
+        
+        self._r_child = right_child
+        if self._r_child:
+            self._r_child.set_parent(self)
+            
+        self._p = None
     
     def next_dimension_subtree(self) -> 'RangeTreeNode':
         raise_if_none(self._next_dim_subtree, MissingFieldException,
