@@ -6,30 +6,29 @@ from Utils.GeneralUtils import matrix_subset
 
 class RangeTree:
     
-    def _build_range_tree(self, nodes:list[list[SingleDimNode]], cur_dim:int,
-                          sort=True) -> RangeTreeNode:
+    def _build_range_tree(
+        self, cur_subset:list[list[SingleDimNode]], cur_dim:int=1) -> RangeTreeNode:
         
-        next_dim_subtree = self._build_range_tree(nodes, cur_dim + 1)   \
+        next_dim_subtree = self._build_range_tree(cur_subset, cur_dim + 1)   \
             if cur_dim < self._dimensionality else None
         
         # Base case - check if leaf:
-        if len(nodes[cur_dim - 1]) == 1:
-            return RangeTreeNode(nodes[cur_dim - 1][0], next_dim_subtree)
+        if len(cur_subset[cur_dim - 1]) == 1:
+            return RangeTreeNode(cur_subset[cur_dim - 1][0])
                 
-        if sort:
-            sort_SingleDimNode_matrix(nodes, cur_dim)
+        sort_SingleDimNode_matrix(cur_subset, cur_dim)
         
         l_index = 0
-        r_index = len(nodes[cur_dim - 1]) - 1
+        r_index = len(cur_subset[cur_dim - 1]) - 1
         m_index = l_index + (r_index - l_index) // 2
         
-        l_subset = matrix_subset(nodes, l_index, m_index)
-        r_subset = matrix_subset(nodes, m_index + 1, r_index)
+        l_subset = matrix_subset(cur_subset, l_index, m_index)
+        r_subset = matrix_subset(cur_subset, m_index + 1, r_index)
                     
         return RangeTreeNode(
             node_info=l_subset[cur_dim - 1][-1],
-            left_child=self._build_range_tree(l_subset, cur_dim, False),
-            right_child=self._build_range_tree(r_subset, cur_dim, False),
+            left_child=self._build_range_tree(l_subset, cur_dim),
+            right_child=self._build_range_tree(r_subset, cur_dim),
             next_dimension_subtree=next_dim_subtree)
     
     
@@ -43,8 +42,7 @@ class RangeTree:
         self._dimensionality = dimensionality
         self._n = len(data_set)
         self._root = self._build_range_tree(
-            fullNode_list_to_SingleDimNode_matrix(data_set),
-            1, sort=True)
+            fullNode_list_to_SingleDimNode_matrix(data_set))
     
     def root(self):
         return self._root

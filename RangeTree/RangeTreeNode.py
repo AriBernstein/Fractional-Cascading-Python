@@ -13,7 +13,6 @@ class RangeTreeNode:
                  right_child:'RangeTreeNode'=None,
                  next_dimension_subtree:'RangeTreeNode'=None) -> None:
         self._node_info = node_info
-        self._next_dim_subtree = next_dimension_subtree
         self._l_child = left_child
         if left_child:
             self._l_child.set_parent(self)
@@ -21,7 +20,8 @@ class RangeTreeNode:
         self._r_child = right_child
         if self._r_child:
             self._r_child.set_parent(self)
-            
+        
+        self._next_dim_subtree = next_dimension_subtree
         self._p = None
     
     def next_dimension_subtree(self) -> 'RangeTreeNode':
@@ -74,8 +74,7 @@ class RangeTreeNode:
     def is_leaf(self) -> bool:
         return self._l_child == None and self._r_child == None
     
-    def leaves(self, leaf_list:list['RangeTreeNode']=[], locations:bool=False
-                ) -> Union[list['RangeTreeNode'], list[LocationNode]]:
+    def get_leaves(self, mode:int=1) -> list:
         """
         Recursive DFS to return all of the leaves in this subtree.
 
@@ -86,57 +85,44 @@ class RangeTreeNode:
         Returns:
             list['RangeTreeNode']: List of RangeTreeNodes that are leaves of
                 this subtree.   """
+                
         if self.is_leaf():
-            return [self] if not locations else [self.get_locationNode()]
+            if mode == 1:
+                return [self]
+            if mode == 2:
+                return [self.get_locationNode()]
+            if mode == 3:
+                return [self.get_locationNode().loc()]
+        
+        leaf_list = []
         
         if self._l_child:
-            leaf_list.extend(self._l_child.leaves_locations(leaf_list))
+            leaf_list.extend(
+                self._l_child.get_leaves(mode))
             
         if self._r_child:
-            leaf_list.extend(self._r_child.leaves_locations(leaf_list))
-        
-        return leaf_list
-    
-
-    def leaves_locations(self, leaf_list:list[LocationNode]=[]) -> list[LocationNode]:
-        """
-        Recursive DFS to return all of the leaves in this subtree.
-
-        Args:
-            leaf_list (list[RangeTreeNode]): List of leaves seen so far to be
-                passed between recursive calls.
-
-        Returns:
-            list['RangeTreeNode']: List of RangeTreeNodes that are leaves of
-                this subtree.   """
-        
-        if self.is_leaf():
-            return [self.get_locationNode()]
-        
-        if self._l_child:
-            leaf_list.extend(self._l_child.leaves_locations(leaf_list))
-            
-        if self._r_child:
-            leaf_list.extend(self._r_child.leaves_locations(leaf_list))
+            leaf_list.extend(
+                self._r_child.get_leaves(mode))
         
         return leaf_list
     
     
     def lower_dim_locations(self) -> list[LocationNode]:
-        locs = [self.get_locationNode()]
-        next_dim_r = self.next_dimension_subtree()
+        locs = [self.get_locationNode().visualizer_str()]
+        
+        next_dim_r = self._next_dim_subtree
         while next_dim_r != None:
-            locs.append(next_dim_r.get_locationNode())
+            locs.append(next_dim_r.get_locationNode().visualizer_str())
             next_dim_r = next_dim_r.next_dimension_subtree()
         return locs
         
     def visualizer_str(self, print_str=False) -> str:
-        ret = f"[{str(self)}]"
+        ret = f"[{str(self.get_data())}]"
         
         if self.is_leaf():
-            return f"{ret} - {self.lower_dim_locations()}"
+            return f"{ret} - {pretty_list(self.lower_dim_locations())}"
         
-        ret += f" {pretty_list(self.lower_dim_locations(), '(', ')')}"
+        ret += f" {pretty_list(self.get_leaves(mode=3), '(', ')')}"
         
         if print_str:
             print(ret)

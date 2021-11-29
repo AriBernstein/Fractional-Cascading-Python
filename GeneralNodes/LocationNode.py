@@ -56,6 +56,9 @@ class LocationNode:
                 the current node as a string.   """
         return self._dim_label if self._dim_label else str(self._dim)
     
+    def visualizer_str(self) -> str:
+        return f"{self.dim_str()}: {self._loc}"
+    
     def __str__(self) -> str:
         return f"Dim: {self.dim_str()}, Loc: {self._loc}"
         

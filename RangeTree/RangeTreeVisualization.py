@@ -10,6 +10,8 @@ _OUT_STR = ""
 def _traverse(cur_str:StringContainer, padding:str, pointer:str,
               cur_root:RangeTreeNode, has_right_sibling:bool) -> None:
     
+    # print(f"_traverse - cur_root: {cur_root}")
+    
     if not cur_root:
         return
     

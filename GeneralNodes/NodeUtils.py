@@ -1,12 +1,14 @@
 from typing import Union
 
 from GeneralNodes.FullNode import FullNode
+from GeneralNodes.LocationNode import LocationNode
 from GeneralNodes.SingleDimNode import SingleDimNode
 from Utils.CustomExceptions import InvalidDimensionalityException, \
     InvalidInputException, InvalidTypeException, MissingParameterException, \
         raise_if_different_types
 
 
+################## Utils for data structures containing nodes ##################
 def fullNode_list_to_SingleDimNode_matrix(
     data_set:list[FullNode]) -> list[list[SingleDimNode]]:
     """
@@ -88,7 +90,7 @@ def _merge_matrices(matrix: list[list[SingleDimNode]],
 
 
 def _merge_lists(
-    arr:Union[list[SingleDimNode], list[FullNode]], 
+    arr:Union[list[SingleDimNode], list[LocationNode], list[FullNode]], 
     l:int, m:int, r:int, mode:int, dim:int=None) -> None:
     """
     Merge function for merge sort. Compare the LocationNode objects in each
@@ -102,8 +104,8 @@ def _merge_lists(
         m (int): Middle index of the subset in this recursive call.
         r (int): Rightmost index of the subset in this recursive call.
         mode (int): Correlates with one of the three types expected by arr.
-            1 -> list[SingleDimNode]
-            3 -> list[FullNode]]
+            1 -> list[SingleDimNode] or list[LocationNode]
+            2 -> list[FullNode]]
         dim (int, optional): If not None, treat arr as list of FullNode 
             instances to be sorted on this field. Otherwise treat arr as list of
             SingleDimNodes. """
