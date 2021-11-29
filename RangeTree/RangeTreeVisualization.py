@@ -29,7 +29,8 @@ def _traverse(cur_str:StringContainer, padding:str, pointer:str,
         if has_right_sibling else _WHITE_SPACE_INDENT
     
     # Determine pointer for next row:
-    pointer_left = _TWO_CHILD_POINTER if cur_root.right_child() != None else _ONE_CHILD_POINTER
+    pointer_left = _TWO_CHILD_POINTER if \
+        cur_root.right_child() != None else _ONE_CHILD_POINTER
     
     # And recurse :)
     _traverse(cur_str, str(new_padding), pointer_left, cur_root.left_child(),
@@ -40,19 +41,18 @@ def _traverse(cur_str:StringContainer, padding:str, pointer:str,
     
 def _traverse_pre_order(root:RangeTreeNode) -> str:
     
-    # Handle root
     if not root:
         return "Empty Range Tree."
     
     visualize_str = StringContainer()
     visualize_str += root.visualizer_str()
     
-    # Determine initial pointer:
-    pointer_left = \
-        _TWO_CHILD_POINTER if root.right_child() != None else _ONE_CHILD_POINTER
+    pointer_left = _TWO_CHILD_POINTER \
+        if root.right_child() != None else _ONE_CHILD_POINTER
     
     _traverse(visualize_str, "", pointer_left, root.left_child(), root.right_child() != None)
     _traverse(visualize_str, "", _ONE_CHILD_POINTER, root.right_child(), False)
+    
     return str(visualize_str)
     
 

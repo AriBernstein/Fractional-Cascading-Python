@@ -90,8 +90,14 @@ class RangeTreeNode:
             if mode == 1:
                 return [self]
             if mode == 2:
-                return [self.get_locationNode()]
+                return [self.get_single_dim_node()]
             if mode == 3:
+                return [self.get_dataNode()]
+            if mode == 4:
+                return [self.get_data()]
+            if mode == 5:
+                return [self.get_locationNode()]
+            if mode == 6:
                 return [self.get_locationNode().loc()]
         
         leaf_list = []
@@ -109,25 +115,19 @@ class RangeTreeNode:
     
     def lower_dim_locations(self) -> list[LocationNode]:
         locs = [self.get_locationNode().visualizer_str()]
-        
-        next_dim_r = self._next_dim_subtree
+        next_dim_r = self.next_dimension_subtree()
         while next_dim_r != None:
             locs.append(next_dim_r.get_locationNode().visualizer_str())
             next_dim_r = next_dim_r.next_dimension_subtree()
         return locs
         
-    def visualizer_str(self, print_str=False) -> str:
+    def visualizer_str(self) -> str:
         ret = f"[{str(self.get_data())}]"
         
         if self.is_leaf():
             return f"{ret} - {pretty_list(self.lower_dim_locations())}"
         
-        ret += f" {pretty_list(self.get_leaves(mode=3), '(', ')')}"
-        
-        if print_str:
-            print(ret)
-            
-        return ret
+        return ret + f" {pretty_list(self.get_leaves(mode=6), '(', ')')}"
     
     def __str__(self) -> str:
         return str(self._node_info)

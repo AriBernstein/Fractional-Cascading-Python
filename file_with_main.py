@@ -18,11 +18,12 @@ if __name__ == "__main__":
         print(i)
     
     rt = RangeTree(full_nodes, dim)
-    print(visualize(rt.root()))
+    rt_root = rt.root()
+    print(
+        visualize(rt_root))
     
-    print(rt.root().next_dimension_subtree())
-    print("================")
-    print(rt.root().get_leaves(mode=3))
+    # print(rt_root.next_dimension_subtree())
+    # print(rt_root.next_dimension_subtree().next_dimension_subtree())
 
 
     

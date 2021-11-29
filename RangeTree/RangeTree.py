@@ -6,15 +6,27 @@ from Utils.GeneralUtils import matrix_subset
 
 class RangeTree:
     
-    def _build_range_tree(
-        self, cur_subset:list[list[SingleDimNode]], cur_dim:int=1) -> RangeTreeNode:
+    def _build_range_tree(self, 
+        cur_subset:list[list[SingleDimNode]], cur_dim:int=1) -> RangeTreeNode:
+        """
+        Method to construct the Range Tree.
+
+        Args:
+            cur_subset (list[list[SingleDimNode]]): Subset of the matrix of 
+                SingleDimNodes being preprocessed into a Range Tree.
+            cur_dim (int, optional): The current dimension of the RangeTreeNode
+                being constructed. 
+
+        Returns:
+            RangeTreeNode: The root of the RangeTree.   """
         
         next_dim_subtree = self._build_range_tree(cur_subset, cur_dim + 1)   \
             if cur_dim < self._dimensionality else None
         
         # Base case - check if leaf:
         if len(cur_subset[cur_dim - 1]) == 1:
-            return RangeTreeNode(cur_subset[cur_dim - 1][0])
+            return RangeTreeNode(node_info=cur_subset[cur_dim - 1][0],
+                                 next_dimension_subtree=next_dim_subtree)
                 
         sort_SingleDimNode_matrix(cur_subset, cur_dim)
         
