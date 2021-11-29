@@ -3,9 +3,47 @@ from GeneralNodes.NodeUtils import fullNode_list_to_SingleDimNode_matrix, sort_S
 from GeneralNodes.SingleDimNode import SingleDimNode
 from RangeTree.RangeTreeNode import RangeTreeNode
 from Utils.GeneralUtils import matrix_subset
+from Utils.TypeUtils import L
+
+LEFT, RIGHT = 0, 1
 
 class RangeTree:
     
+    def _query_range_tree(self, target:L, cur_root:RangeTreeNode,
+                          path:list[tuple[int, RangeTreeNode]]=None,
+                          predecessor=True) -> RangeTreeNode:
+        """
+        Search RangeTree for a specific Node or its predecessor/successor. 
+
+        Args:
+            target (L): The Location value for which we are searching.
+            cur_root (RangeTreeNode): the root of the current subtree in which 
+                we are searching.
+            path (list[tuple[int, RangeTreeNode]], optional): A list containing 
+                (int, RangeTreeNode) denoting the path taken by this search 
+                recursively through the RangeTree.
+                    int = 0 -> LEFT, int = 1 -> RIGHT
+            predecessor (bool): given that no RangeTreeNode is located at 
+                target, if true, return the RangeTreeNode and the preceding 
+                location, otherwise return the RangeTreeNode at the succeeding,
+
+        Returns:
+            RangeTreeNode: The RangeTreeNode at target location, or that at its 
+                preceding or succeeding target location.    """
+        
+        if cur_root.is_leaf():
+            if path != None: path.append((-1, cur_root))
+            return cur_root
+        
+        elif target <= cur_root:
+            if path != None: path.append((LEFT, cur_root))
+            return self._query_range_tree(cur_root.left_child(), target, path)
+        
+        else:
+            if path != None: path.append((RIGHT, cur_root))
+            return self._query_range_tree(cur_root.right_child(), target, path)
+                
+            
     def _build_range_tree(self, 
         cur_subset:list[list[SingleDimNode]], cur_dim:int=1) -> RangeTreeNode:
         """

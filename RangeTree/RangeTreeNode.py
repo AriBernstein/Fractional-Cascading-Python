@@ -134,3 +134,52 @@ class RangeTreeNode:
     
     def __repr__(self) -> str:
         return str(self)
+    
+    def _get_comparison(self, __o: object) -> Union[
+        'RangeTreeNode', SingleDimNode, LocationNode, L]:
+        
+        if isinstance(__o, RangeTreeNode):
+            return self
+        if isinstance(__o, SingleDimNode):
+            return self.get_single_dim_node()
+        if isinstance(__o, LocationNode):
+            return self.get_locationNode()
+        if isinstance(__o, L):
+            return self.get_location()
+        return None
+            
+    def __eq__(self, __o: object) -> bool:
+        c = self._get_comparison(__o)
+        if not c:
+            return False
+        return c == __o
+    
+    def __ne__(self, __o: object) -> bool:
+        c = self._get_comparison(__o)
+        if not c:
+            return False
+        return c != __o
+    
+    def __gt__(self, __o: object) -> bool:
+        c = self._get_comparison(__o)
+        if not c:
+            return False
+        return c > __o
+    
+    def __lt__(self, __o: object) -> bool:
+        c = self._get_comparison(__o)
+        if not c:
+            return False
+        return c < __o
+    
+    def __ge__(self, __o: object) -> bool:
+        c = self._get_comparison(__o)
+        if not c:
+            return False
+        return c >= __o
+    
+    def __le__(self, __o: object) -> bool:
+        c = self._get_comparison(__o)
+        if not c:
+            return False
+        return c <= __o
