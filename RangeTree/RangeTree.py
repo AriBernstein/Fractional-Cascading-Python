@@ -9,6 +9,21 @@ LEFT, RIGHT = 0, 1
 
 class RangeTree:
     
+    def __init__(self, data_set:list[FullNode], dimensionality:int) -> None:
+        if len(data_set) == 0:
+            raise Exception("data_set is empty. Cannot construct RangeTree.")
+        if dimensionality < 1:
+            raise Exception(f"dimensionality value ({dimensionality}) must " + \
+                "be greater than 1.")
+        
+        self._dimensionality = dimensionality
+        self._n = len(data_set)
+        self._root = self._build_range_tree(
+            fullNode_list_to_SingleDimNode_matrix(data_set))
+        
+    def root(self):
+        return self._root
+    
     def _build_range_tree(self, 
         cur_subset:list[list[SingleDimNode]], cur_dim:int=1) -> RangeTreeNode:
         """
@@ -203,19 +218,3 @@ class RangeTree:
             nodes_in_search_range.extend(range_tree_node.get_leaves())
         
         return nodes_in_search_range
-        
-    
-    def __init__(self, data_set:list[FullNode], dimensionality:int) -> None:
-        if len(data_set) == 0:
-            raise Exception("data_set is empty. Cannot construct RangeTree.")
-        if dimensionality < 1:
-            raise Exception(f"dimensionality value ({dimensionality}) must " + \
-                "be greater than 1.")
-        
-        self._dimensionality = dimensionality
-        self._n = len(data_set)
-        self._root = self._build_range_tree(
-            fullNode_list_to_SingleDimNode_matrix(data_set))
-    
-    def root(self):
-        return self._root

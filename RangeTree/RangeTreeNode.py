@@ -125,8 +125,7 @@ class RangeTreeNode:
         return str(self._node_info)
     
     def __repr__(self) -> str:
-        return str(self)    
-            
+        return str(self)
             
     def __eq__(self, __o: object) -> bool:
         if isinstance(__o, RangeTreeNode):

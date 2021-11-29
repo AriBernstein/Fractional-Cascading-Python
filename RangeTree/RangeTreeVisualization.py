@@ -1,3 +1,5 @@
+from typing import Union
+from RangeTree.RangeTree import RangeTree
 from Utils.GeneralUtils import StringContainer
 from RangeTree.RangeTreeNode import RangeTreeNode
 
@@ -66,8 +68,9 @@ def _traverse_pre_order(cur_root:RangeTreeNode) -> str:
     return str(visualize_str)
     
 
-def visualize(root:RangeTreeNode, vertical_spacing:int=2, 
-              indent_per_level:int=7, safe_chars:bool=False) -> str:
+def visualize_range_tree(root:Union[RangeTreeNode, RangeTree],
+                         vertical_spacing:int=2, indent_per_level:int=7, 
+                         safe_chars:bool=False, print_tree=False) -> str:
     
     # Reset/reassign global graphic variables for visualization
     global _HORIZONTAL_LINE_CHARS, _NOT_LAST_CHILD_POINTER, \
@@ -87,5 +90,11 @@ def visualize(root:RangeTreeNode, vertical_spacing:int=2,
     _PADDING_CHARS = " " * (indent_per_level + 1)
     _TWO_CHILDREN_INDENT = _v_line_char() + _PADDING_CHARS
     _WHITE_SPACE_INDENT = ' ' + _PADDING_CHARS
-
-    return str(_traverse_pre_order(root))
+    
+    root = root.root() if isinstance(root, RangeTree) else root
+    ret_str = str(_traverse_pre_order(root))
+    
+    if print_tree:
+        print(ret_str)
+    
+    return ret_str
