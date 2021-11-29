@@ -34,8 +34,3 @@ class SingleDimNode:
         if isinstance(__o, SingleDimNode):
             return __o.data() == self._data and __o.locationNode() == self._loc
         return False
-    
-    def __ne__(self, __o: object) -> bool:
-        if isinstance(__o, SingleDimNode):
-            return not self.__eq__(__o)
-        return False

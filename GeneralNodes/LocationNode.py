@@ -72,11 +72,6 @@ class LocationNode:
             
         return False
     
-    def __ne__(self, __o: object) -> bool:
-        if isinstance(__o, LocationNode):
-            return not self.__eq__(__o)
-        return False
-    
     def __gt__(self, __o: object) -> bool:
         if isinstance(__o, LocationNode):
             return self._loc > __o.loc()

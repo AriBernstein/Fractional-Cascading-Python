@@ -117,8 +117,3 @@ class FullNode:
                 
             return True
         return False
-    
-    def __ne__(self, __o: object) -> bool:
-        if isinstance(__o, FullNode):
-            return not self.__eq__(__o)
-        return False

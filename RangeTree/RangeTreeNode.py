@@ -25,32 +25,24 @@ class RangeTreeNode:
         self._p = None
     
     def next_dimension_subtree(self) -> 'RangeTreeNode':
-        # raise_if_none(self._next_dim_subtree, MissingFieldException,
-        #               ("RangeTreeNode", "_next_dim_subtree"))
         return self._next_dim_subtree
     
     def dimension(self) -> int:
         return self._node_info.dim()
     
     def left_child(self) -> 'RangeTreeNode':
-        # raise_if_none(self._l_child, MissingFieldException,
-        #              ("RangeTreeNode", "_l_child"))
         return self._l_child
     
     def set_left_child(self, left_child:'RangeTreeNode') -> None:
         self._l_child = left_child
     
     def right_child(self) -> 'RangeTreeNode':
-        # raise_if_none(self._r_child, MissingFieldException,
-        #              ("RangeTreeNode", "_r_child"))
         return self._r_child
 
     def set_right_child(self, right_child:'RangeTreeNode') -> None:
         self._r_child = right_child
         
     def parent(self) -> 'RangeTreeNode':
-        # raise_if_none(self._p, MissingFieldException,
-        #              ("RangeTreeNode", "_p (parent)"))
         return self._p
     
     def set_parent(self, parent:'RangeTreeNode') -> None:
@@ -115,10 +107,10 @@ class RangeTreeNode:
     
     def lower_dim_locations(self) -> list[LocationNode]:
         locs = [self.get_locationNode().visualizer_str()]
-        next_dim_r = self.next_dimension_subtree()
-        while next_dim_r != None:
-            locs.append(next_dim_r.get_locationNode().visualizer_str())
-            next_dim_r = next_dim_r.next_dimension_subtree()
+        next_dim_root = self.next_dimension_subtree()
+        while next_dim_root != None:
+            locs.append(next_dim_root.get_locationNode().visualizer_str())
+            next_dim_root = next_dim_root.next_dimension_subtree()
         return locs
         
     def visualizer_str(self) -> str:
@@ -133,53 +125,30 @@ class RangeTreeNode:
         return str(self._node_info)
     
     def __repr__(self) -> str:
-        return str(self)
-    
-    def _get_comparison(self, __o: object) -> Union[
-        'RangeTreeNode', SingleDimNode, LocationNode, L]:
-        
-        if isinstance(__o, RangeTreeNode):
-            return self
-        if isinstance(__o, SingleDimNode):
-            return self.get_single_dim_node()
-        if isinstance(__o, LocationNode):
-            return self.get_locationNode()
-        if isinstance(__o, type(L)):
-            return self.get_location()
-        return None
+        return str(self)    
+            
             
     def __eq__(self, __o: object) -> bool:
-        c = self._get_comparison(__o)
-        if not c:
-            return False
-        return c == __o
-    
-    def __ne__(self, __o: object) -> bool:
-        c = self._get_comparison(__o)
-        if not c:
-            return False
-        return c != __o
+        if isinstance(__o, RangeTreeNode):
+            return self.get_locationNode() == __o.get_locationNode()
+        return False
     
     def __gt__(self, __o: object) -> bool:
-        c = self._get_comparison(__o)
-        if not c:
-            return False
-        return c > __o
+        if isinstance(__o, RangeTreeNode):
+            return self.get_locationNode() > __o.get_locationNode()
+        return False
     
     def __lt__(self, __o: object) -> bool:
-        c = self._get_comparison(__o)
-        if not c:
-            return False
-        return c < __o
+        if isinstance(__o, RangeTreeNode):
+            return self.get_locationNode() < __o.get_locationNode()
+        return False    
     
     def __ge__(self, __o: object) -> bool:
-        c = self._get_comparison(__o)
-        if not c:
-            return False
-        return c >= __o
+        if isinstance(__o, RangeTreeNode):
+            return not self < __o.get_locationNode()
+        return False
     
-    def __le__(self, __o: object) -> bool:
-        c = self._get_comparison(__o)
-        if not c:
-            return False
-        return c <= __o
+    def __ge__(self, __o: object) -> bool:
+        if isinstance(__o, RangeTreeNode):
+            return not self > __o.get_locationNode()
+        return False

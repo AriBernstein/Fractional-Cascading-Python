@@ -7,7 +7,7 @@ from RangeTree.RangeTreeVisualization import visualize
 
 if __name__ == "__main__":
     # print(rand_unique_ints(10, 10, 20))
-    n = 5
+    n = 6
     dim = 3
     loc_min = 0
     loc_max = 100
@@ -22,8 +22,8 @@ if __name__ == "__main__":
     print(
         visualize(rt_root))
     
-    # print(rt_root.next_dimension_subtree())
-    # print(rt_root.next_dimension_subtree().next_dimension_subtree())
+    print(rt_root.next_dimension_subtree())
+    print(rt_root.next_dimension_subtree().next_dimension_subtree())
 
 
     
