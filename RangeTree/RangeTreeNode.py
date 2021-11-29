@@ -144,7 +144,7 @@ class RangeTreeNode:
             return self.get_single_dim_node()
         if isinstance(__o, LocationNode):
             return self.get_locationNode()
-        if isinstance(__o, L):
+        if isinstance(__o, type(L)):
             return self.get_location()
         return None
             
