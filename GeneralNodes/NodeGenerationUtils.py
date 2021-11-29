@@ -41,8 +41,8 @@ def rand_unique_ints(
 
 
 def generate_FullNode_data_set(
-    n:int, dim: int, loc_min:int, loc_max:int,
-    insert_one:int=None, insert_two:int=None) -> list[FullNode]:
+    n:int, dim: int, loc_min:int, loc_max:int, insert_one:int=None,
+    insert_two:int=None, xyz_label:bool=True) -> list[FullNode]:
     
     """
     Generate list of FullNode objects with randomized data and locations.
@@ -60,11 +60,14 @@ def generate_FullNode_data_set(
             location value (exclusive).
         insert_one, insert_two (int, optional): If not none, place in a random
             location in output.
+        xyz_label (bool): If true, and dim is <= 3, then label dimension 1 as 
+            'x', dimension 2 as 'y', dimension 3 as 'z' (given that they exist).
 
     Returns:
         list[FullNode]: List of n FullNode objects with randomized integer data
             and location values, all unique in their own dimensions and between
             loc_min and loc_max.    """
+    xyz_dict = {1:'x', 2: 'y', 3: 'z'}
     
     node_data_matrix = [    # dim + 1 -> extra integer for data
         rand_unique_ints(n, loc_min, loc_max, insert_one, insert_two)
@@ -78,7 +81,8 @@ def generate_FullNode_data_set(
     for i in range(n):
         loc_dict = {}
         for j in range(1, dim + 1):
-            loc_dict[j] = LocationNode(node_data_matrix[j][i], j)
+            d_label = xyz_dict[j] if dim <= 3 and xyz_label else None
+            loc_dict[j] = LocationNode(node_data_matrix[j][i], j, d_label)
         node_list.append(FullNode(DataNode(node_data_matrix[0][i]), loc_dict))
                 
     return node_list
