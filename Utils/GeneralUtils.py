@@ -4,6 +4,10 @@ from Utils.CustomExceptions import InvalidTypeException
 
 class StringContainer:
     
+    """
+    Class to contain a string to be passed as a reference and mutated over 
+    method calls.   """
+    
     def __init__(self, initial_str:str="") -> None:
         self._str = initial_str
         self._i = 0
@@ -25,6 +29,11 @@ class StringContainer:
     
     def __repr__(self) -> str:
         return str(self)
+    
+    def __eq__(self, __o: object) -> bool:
+        if isinstance(__o, StringContainer) or isinstance(__o, str):
+            return self._str == str(__o)
+        return False
     
     def __iadd__(self, __o:object) -> None:
         if isinstance(__o, str) or isinstance(__o, chr):
@@ -88,6 +97,7 @@ def pretty_dict(d:dict, key_list:list=None, left_indent_len:int=4) -> str:
     for k in key_list: 
         ret += f"{' ' * left_indent_len}{k} -> {d[k]}\n"
     return ret.rstrip()
+
 
 def pad_ints(i:int, n:int) -> str:
     """

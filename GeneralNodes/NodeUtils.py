@@ -5,7 +5,7 @@ from GeneralNodes.LocationNode import LocationNode
 from GeneralNodes.SingleDimNode import SingleDimNode
 from Utils.CustomExceptions import InvalidDimensionalityException, \
     InvalidInputException, InvalidTypeException, MissingParameterException, \
-        raise_if_different_types
+        raise_if_not_expected_types
 
 
 ################## Utils for data structures containing nodes ##################
@@ -190,7 +190,7 @@ def _merge_sort(arr:Union[list[SingleDimNode], list[FullNode], list[list[SingleD
             "mode", mode, "between 1 and 3 (inclusive)", "_merge_sort")
     
     if dim != None: # Ensure that arr is a list of FullNodes
-        raise_if_different_types(
+        raise_if_not_expected_types(
             obj=arr[0], expected_type=FullNode, exception=InvalidTypeException, 
             params=[type(arr[0]), FullNode, "_merge_sort"])
 

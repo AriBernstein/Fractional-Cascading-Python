@@ -5,15 +5,26 @@ from GeneralNodes.LocationNode import LocationNode
 from GeneralNodes.SingleDimNode import SingleDimNode
 from Utils.GeneralUtils import pretty_list
 from Utils.TypeUtils import D, L
-from Utils.CustomExceptions import MissingFieldException, raise_if_none
 
 class RangeTreeNode:
+    
+    """
+    Class representing a node for the RangeTree structure.
+    
+    Fields:
+        _single_dim_node (SingleDimNode): Stores all data and location objects.
+        _l_child (RangeTreeNode): The left child of this RangeTreeNode.
+        _r_child (RangeTreeNode): The right child of this RangeTreeNode.
+        _next_dim_subtree (RangeTreeNode): Pointer to a tree with the same data
+            but ordered by the following demension.
+        _p (RangeTreeNode): The parent of this RangeTreeNode.   """
     
     def __init__(self, node_info:SingleDimNode, 
                  left_child:'RangeTreeNode'=None,
                  right_child:'RangeTreeNode'=None,
                  next_dimension_subtree:'RangeTreeNode'=None) -> None:
-        self._node_info = node_info
+        
+        self._single_dim_node = node_info
         self._l_child = left_child
         if left_child:
             self._l_child.set_parent(self)
@@ -26,12 +37,21 @@ class RangeTreeNode:
         self._p = None
     
     def next_dimension_subtree(self) -> 'RangeTreeNode':
+        """
+        Returns:
+            RangeTreeNode: Pointer to a tree with the same data but ordered by
+                the following demension.    """
+        
         return self._next_dim_subtree
     
     def dimension(self) -> int:
-        return self._node_info.dim()
+        """
+        Returns:
+            int: The dimension of the location of this RangeTreeNode.   """
+            
+        return self._single_dim_node.dim()
     
-    def left_child(self) -> 'RangeTreeNode':
+    def left_child(self) -> 'RangeTreeNode':        
         return self._l_child
     
     def set_left_child(self, left_child:'RangeTreeNode') -> None:
@@ -50,19 +70,19 @@ class RangeTreeNode:
         self._p = parent
     
     def get_single_dim_node(self) -> SingleDimNode:
-        return self._node_info
+        return self._single_dim_node
     
     def get_dataNode(self) -> DataNode:
-        return self._node_info.dataNode()
+        return self._single_dim_node.dataNode()
     
     def get_data(self) -> D:
-        return self._node_info.dataNode().data()
+        return self._single_dim_node.dataNode().data()
     
     def get_locationNode(self) -> LocationNode:
-        return self._node_info.locationNode()
+        return self._single_dim_node.locationNode()
     
     def get_location(self) -> L:
-        return self._node_info.locationNode().loc()
+        return self._single_dim_node.locationNode().loc()
     
     def is_leaf(self) -> bool:
         return self._l_child == None and self._r_child == None
@@ -151,6 +171,10 @@ class RangeTreeNode:
         return FullNode(self.get_dataNode(), loc_dict)
         
     def visualizer_str(self) -> str:
+        """
+        Returns:
+            str: String meant as a component of RangeTree visualization.    """
+        
         ret = f"[{str(self.get_location())}]"
         
         if self.is_leaf():
@@ -160,7 +184,7 @@ class RangeTreeNode:
         return ret + f" {pretty_list(self.get_leaves(mode=6), '(', ')')}"
     
     def __str__(self) -> str:
-        return str(self._node_info)
+        return str(self._single_dim_node)
     
     def __repr__(self) -> str:
         return str(self)

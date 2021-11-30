@@ -84,9 +84,19 @@ def raise_if_equal(obj_a:object, obj_b:object, invert:bool=False,
     raise exception(*params) if exception else Exception(*params)
 
 
-def raise_if_different_types(obj:object, expected_type:type, 
-                             exception:Type[Exception]=None, 
-                             params:list=None) -> None:
+def raise_if_not_expected_types(
+    obj:object, expected_type:type, exception:Type[Exception]=None,
+    params:list=None) -> None:
+    """
+    Raise an exception if an object is not of an expected type.
+
+    Args:
+        obj (object): To be checked if expected_type.
+        expected_type (type): To be checked against obj.
+        exception (Type[Exception], optional): Exception type to be raised if
+            obj_a is not of type expected_type. If None, use default Exception.
+        params (list, optional): List containing parameters to be used when 
+            calling exception constructor.  """
     raise_if_equal(obj, expected_type, True, exception, params, True)
 
 

@@ -1,6 +1,7 @@
 from GeneralNodes.DataNode import DataNode
 from GeneralNodes.FullNode import FullNode
-from GeneralNodes.NodeUtils import fullNode_list_to_SingleDimNode_matrix, sort_SingleDimNode_list, sort_SingleDimNode_matrix
+from GeneralNodes.NodeUtils import fullNode_list_to_SingleDimNode_matrix, \
+    sort_SingleDimNode_list, sort_SingleDimNode_matrix
 from GeneralNodes.SingleDimNode import SingleDimNode
 from RangeTree.RangeTreeNode import RangeTreeNode
 from Utils.CustomExceptions import InvalidDimensionalityException
@@ -11,7 +12,23 @@ LEFT, RIGHT = 0, 1
 
 class RangeTree:
     
+    """
+    Class to represent Range Tree. Contains a pointer to the root RangeTreeNode,
+    as well as construction and querying functionality.
+    
+    Fields:
+        _dimensionality (int): the number of dimensionality of the data set 
+            represented by this Range Tree.
+        _root (RangeTreeNode): the root node of the Range Tree. """
+        
+    
     def __init__(self, data_set:list[FullNode], dimensionality:int) -> None:
+        """
+        Args:
+            data_set (list[FullNode]): List of FullNode instances to be
+                preprocessed into Range Tree.
+            dimensionality (int): The Dimensionality of data_set.   """
+        
         if len(data_set) == 0:
             raise Exception("data_set is empty. Cannot construct RangeTree.")
         if dimensionality < 1:
@@ -19,7 +36,6 @@ class RangeTree:
                 "be greater than 1.")
         
         self._dimensionality = dimensionality
-        self._n = len(data_set)
         self._root = self._build_range_tree(
             fullNode_list_to_SingleDimNode_matrix(data_set))
         
@@ -27,6 +43,14 @@ class RangeTree:
         return self._root
     
     def root_by_dimension(self, dimension:int) -> RangeTreeNode:
+        """
+        Args:
+            dimension (int): The dimension of the RangeTreeNode to return.
+
+        Returns:
+            RangeTreeNode: Highest-level RangeTreeNode at dimension in Range
+                Tree.   """
+                
         if not 1 <= dimension <= self._dimensionality:
             raise InvalidDimensionalityException(dimension, self._dimensionality)
         cur_root = self._root
@@ -78,14 +102,10 @@ class RangeTree:
     
     
     def _query(self, target:L, cur_root:RangeTreeNode,
-               path:list[tuple[int, RangeTreeNode]]=None,
-               predecessor=False) -> RangeTreeNode:
+               path:list[tuple[int, RangeTreeNode]]=None) -> RangeTreeNode:
         """
-        Search RangeTree for a specific Node or its predecessor/successor. 
-        (Defaults to successor.)
+        Search RangeTree for a specific Node or its successor. 
         
-        TODO Implement predecessor functionality
-
         Args:
             target (L): The Location value of the RangeTreeNode for which we are
                 searching.
@@ -95,15 +115,10 @@ class RangeTree:
                 (int, RangeTreeNode) denoting the path taken by this search 
                 recursively through the RangeTree.
                     int = 0 -> LEFT, int = 1 -> RIGHT
-            successor (bool): given that no RangeTreeNode is located at 
-                target, if true, return the RangeTreeNode at the succeeding 
-                location. Otherwise (and by default), return the RangeTreeNode 
-                at the succeeding location.
 
         Returns:
             RangeTreeNode: The RangeTreeNode at target location, or that at its 
                 preceding or succeeding target location.    """
-        # TODO: Implement successor (currently defaults to predecessor)
         
         if cur_root.is_leaf():
             if path != None: path.append((-1, cur_root))
@@ -111,11 +126,11 @@ class RangeTree:
         
         elif target <= cur_root.get_location():
             if path != None: path.append((LEFT, cur_root))
-            return self._query(target, cur_root.left_child(), path, predecessor)
+            return self._query(target, cur_root.left_child(), path)
 
         else:
             if path != None: path.append((RIGHT, cur_root))
-            return self._query(target, cur_root.right_child(), path, predecessor)
+            return self._query(target, cur_root.right_child(), path)
         
     
     def query_range_tree(self, target:L, search_dimension:int=1,
@@ -132,8 +147,9 @@ class RangeTree:
             print_result (bool): If True, print search result. Default False.
 
         Returns:
-            list[SingleDimNode]: A list of SingleDimNodes, each representing a
-                the data's location in a different dimension.   """
+            list[SingleDimNode]: A list of SingleDimNodes, each representing the
+                data's location in all dimensions including and following
+                search_dimension.   """
                 
         if not (1 <= search_dimension <= self._dimensionality):
             raise InvalidDimensionalityException(search_dimension,
@@ -143,10 +159,11 @@ class RangeTree:
         while cur_root.dimension() < search_dimension:
             cur_root = cur_root.next_dimension_subtree()
         
-        ret_node = self._query(target, cur_root).first_dim_root()
+        ret_node = self._query(target, cur_root)
                 
         if print_result:
-            print(f"Search result for {str(target)}:\n{ret_node.all_locations_str()}")
+            print(f"Search result for {str(target)}:\n" + \
+                str(ret_node.get_single_dim_node()))
             
         ret_list = []
         while ret_node is not None:
@@ -159,10 +176,23 @@ class RangeTree:
     def _search_rec(
         self, cur_root:RangeTreeNode, cur_dim:int, 
         range_mins:list[type[L]], range_maxes:list[type[L]]) -> list[RangeTreeNode]:
+
+        """
+        Recursively search RangeTree to poopulate a list of RangeTreeNodes
+        representing canonical subsets of the Range Tree.
         
-        print(f"RANGE MINS: {range_mins}")
-        print(f"RANGE MAXES: {range_maxes}")
-        print("CUR_DIM - 1: " + str(cur_dim - 1))
+        Args:
+            cur_root (RangeTreeNode): The subtree of the current recursive call.
+            cur_dim (int): The dimension of the subtree of the current 
+                recursive call. 
+            range_mins, range_maxes (list[type[L]]): List of L (generic location 
+                objects), each representing the low and high ranges of the 
+                search for the demension correlated with each list index plus one.
+                
+        Returns:
+            list[RangeTreeNodes]: List of RangeTreeNodes representing canonical 
+            subsets of the Range Tree.  """
+        
         range_min = range_mins[cur_dim - 1]
         range_max = range_maxes[cur_dim - 1] 
         
@@ -244,8 +274,6 @@ class RangeTree:
 
         
         # Handle case where no nodes are in range:
-        # TODO - add predecessor/successor settings and only perform this step 
-        #        when neither are accepted
         if len(canonical_subsets) == 1 and canonical_subsets[0].is_leaf():
             if not in_range(canonical_subsets[0].get_location()):
                 canonical_subsets = []
@@ -269,6 +297,19 @@ class RangeTree:
     def orthogonal_range_search(self,
         range_mins:list[L], range_maxes:list[L],
         sort_on_data_after_query:bool=True) -> list[DataNode]:
+        """
+        Perform an orthogonal range search on this RangeTree instance.
+
+        Args:
+            range_mins, range_maxes (list[type[L]]): List of L (generic location 
+                objects), each representing the low and high ranges of the 
+                search for the demension correlated with each list index plus one.
+            sort_on_data_after_query (bool, optional): If true, sort results of
+                search on their data fields. Defaults to True.
+                
+        Returns:
+            list[DataNode]: List of DataNode instances located between the
+                locations specified in range_mins and range_maxes.  """
         
         if len(range_mins) != len(range_maxes):
             raise Exception("orthogonal_range_search method parameters " + \
