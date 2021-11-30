@@ -102,7 +102,8 @@ class RangeTree:
     
     
     def _query(self, target:L, cur_root:RangeTreeNode,
-               path:list[tuple[int, RangeTreeNode]]=None) -> RangeTreeNode:
+               path:list[tuple[int, RangeTreeNode]]=None,
+               predecessor:bool=False) -> RangeTreeNode:
         """
         Search RangeTree for a specific Node or its successor. 
         
@@ -115,29 +116,38 @@ class RangeTree:
                 (int, RangeTreeNode) denoting the path taken by this search 
                 recursively through the RangeTree.
                     int = 0 -> LEFT, int = 1 -> RIGHT
+            predecessor (bool): If True, and no node exists at L, return the 
+                node in the preceding location. Otherwise, return successor
+                (default).
 
         Returns:
             RangeTreeNode: The RangeTreeNode at target location, or that at its 
                 preceding or succeeding target location.    """
+                
+        def handle_left() -> RangeTreeNode:
+            if path != None: path.append((LEFT, cur_root))
+            return self._query(target, cur_root.left_child(), path)
+        
+        def handle_right() -> RangeTreeNode:
+            if path != None: path.append((RIGHT, cur_root))
+            return self._query(target, cur_root.right_child(), path)
         
         if cur_root.is_leaf():
             if path != None: path.append((-1, cur_root))
             return cur_root
-        
-        elif target <= cur_root.get_location():
-            if path != None: path.append((LEFT, cur_root))
-            return self._query(target, cur_root.left_child(), path)
-
+        elif predecessor:
+            return handle_right() \
+                if target >= cur_root.get_location() else handle_left()
         else:
-            if path != None: path.append((RIGHT, cur_root))
-            return self._query(target, cur_root.right_child(), path)
-        
+            return handle_left() \
+                if target <= cur_root.get_location() else handle_right()
     
     def query_range_tree(self, target:L, search_dimension:int=1,
-                         print_result:bool=False) -> list[SingleDimNode]:
+                         print_result:bool=False,
+                         predecessor:bool=False) -> list[SingleDimNode]:
         """
-        Search RangeTree for a Node at a specific location or its successor 
-        should none exist.
+        Search RangeTree for a Node at a specific location or its successor (or
+        predecessor if the option is enabled) should none exist.
 
         Args:
             target (L): The Location value of the RangeTreeNode for which we are
@@ -145,6 +155,9 @@ class RangeTree:
             search_dimension (int): The demension in which to search for nodes 
                 at this location. Defaults to 1.
             print_result (bool): If True, print search result. Default False.
+            predecessor (bool): If True, and no node exists at L, return the 
+                node in the preceding location. Otherwise, return successor
+                (default).
 
         Returns:
             list[SingleDimNode]: A list of SingleDimNodes, each representing the
@@ -159,7 +172,7 @@ class RangeTree:
         while cur_root.dimension() < search_dimension:
             cur_root = cur_root.next_dimension_subtree()
         
-        ret_node = self._query(target, cur_root)
+        ret_node = self._query(target, cur_root, predecessor=predecessor)
                 
         if print_result:
             print(f"Search result for {str(target)}:\n" + \
