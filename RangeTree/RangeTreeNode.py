@@ -114,12 +114,30 @@ class RangeTreeNode:
     
     
     def lower_dim_locations(self) -> list[LocationNode]:
+        """
+        Returns:
+            list[LocationNode]: List of LocationNode instances, each correlating
+                with a location of this RangeTreeNode in a different demension.
+        """
         locs = [self.get_locationNode().visualizer_str()]
         next_dim_root = self.next_dimension_subtree()
         while next_dim_root != None:
             locs.append(next_dim_root.get_locationNode().visualizer_str())
             next_dim_root = next_dim_root.next_dimension_subtree()
         return locs
+    
+    
+    def all_locations_str(self) -> str:
+        """
+        Returns:
+            str: string representation of this RangeTreeNode including data and
+                location in every dimension.    """
+        
+        ret = f"Data: {self.get_data()}, Location:\n"
+        for loc_node in self.lower_dim_locations():
+            ret += f"\t{loc_node}\n"
+        return ret
+    
         
     def visualizer_str(self) -> str:
         ret = f"[{str(self.get_data())}]"
