@@ -1,5 +1,6 @@
+from GeneralNodes.DataNode import DataNode
 from GeneralNodes.FullNode import FullNode
-from GeneralNodes.NodeUtils import fullNode_list_to_SingleDimNode_matrix, sort_SingleDimNode_matrix
+from GeneralNodes.NodeUtils import fullNode_list_to_SingleDimNode_matrix, sort_SingleDimNode_list, sort_SingleDimNode_matrix
 from GeneralNodes.SingleDimNode import SingleDimNode
 from RangeTree.RangeTreeNode import RangeTreeNode
 from Utils.CustomExceptions import InvalidDimensionalityException
@@ -54,13 +55,9 @@ class RangeTree:
         
         # Base case - check if leaf:
         if len(cur_subset[cur_dim - 1]) == 1:
-            this_leaf = RangeTreeNode(node_info=cur_subset[cur_dim - 1][0],
-                                      next_dimension_subtree=next_dim_subtree)
-            if next_dim_subtree:
-                next_dim_subtree.set_prev_dim_subtree(this_leaf)
+            return RangeTreeNode(node_info=cur_subset[cur_dim - 1][0],
+                                 next_dimension_subtree=next_dim_subtree)
             
-            return this_leaf
-        
         # Always sort
         sort_SingleDimNode_matrix(cur_subset, cur_dim)
         
@@ -76,9 +73,6 @@ class RangeTree:
             left_child=self._build_range_tree(l_subset, cur_dim),
             right_child=self._build_range_tree(r_subset, cur_dim),
             next_dimension_subtree=next_dim_subtree)
-        
-        if next_dim_subtree:
-            next_dim_subtree.set_prev_dim_subtree(this_root)
             
         return this_root
     
@@ -149,11 +143,8 @@ class RangeTree:
         while cur_root.dimension() < search_dimension:
             cur_root = cur_root.next_dimension_subtree()
         
-        ret_node = self._query(target, cur_root)
-
-        # while ret_node.dimension() > 1: # Walk back to first dimension
-        #     ret_node = ret_node.prev_dimension_subtree()
-        
+        ret_node = self._query(target, cur_root).first_dim_root()
+                
         if print_result:
             print(f"Search result for {str(target)}:\n{ret_node.all_locations_str()}")
             
@@ -169,7 +160,11 @@ class RangeTree:
         self, cur_root:RangeTreeNode, cur_dim:int, 
         range_mins:list[type[L]], range_maxes:list[type[L]]) -> list[RangeTreeNode]:
         
-        range_min, range_max = range_mins[cur_dim - 1], range_maxes[cur_dim - 1] 
+        print(f"RANGE MINS: {range_mins}")
+        print(f"RANGE MAXES: {range_maxes}")
+        print("CUR_DIM - 1: " + str(cur_dim - 1))
+        range_min = range_mins[cur_dim - 1]
+        range_max = range_maxes[cur_dim - 1] 
         
         def in_range(loc:L) -> bool:
             return range_min <= loc <= range_max
@@ -273,15 +268,27 @@ class RangeTree:
         
     def orthogonal_range_search(self,
         range_mins:list[L], range_maxes:list[L],
-        sort_on_data_after_query:bool=True) -> list[RangeTreeNode]:
+        sort_on_data_after_query:bool=True) -> list[DataNode]:
+        
+        if len(range_mins) != len(range_maxes):
+            raise Exception("orthogonal_range_search method parameters " + \
+                "range_mins and range_maxes must be of equal length.")
+        
+        if len(range_mins) < self._dimensionality:
+            raise Exception("orthogonal_range_search method parameters " + \
+                "range_mins and range_maxes must be of length greater than " + \
+                    "or equal to the dimensionality of this Range Tree.")
         
         # Find canonical subsets from final dimension, extract and combine lists
         # of RangeTreeNodes
         canonical_subsets_in_range = \
             self._search_rec(self._root, 1, range_mins, range_maxes)
         
-        nodes_in_search_range = []
+        nodes_in_search_range = []  # type:list[SingleDimNode]
         for range_tree_node in canonical_subsets_in_range:
-            nodes_in_search_range.extend(range_tree_node.get_leaves())
+            nodes_in_search_range.extend(range_tree_node.get_leaves(mode=2))
+            
+        if sort_on_data_after_query:
+            sort_SingleDimNode_list(nodes_in_search_range, True)
         
-        return nodes_in_search_range
+        return [sd_node.dataNode() for sd_node in nodes_in_search_range]

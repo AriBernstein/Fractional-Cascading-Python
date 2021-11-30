@@ -12,8 +12,7 @@ class RangeTreeNode:
     def __init__(self, node_info:SingleDimNode, 
                  left_child:'RangeTreeNode'=None,
                  right_child:'RangeTreeNode'=None,
-                 next_dimension_subtree:'RangeTreeNode'=None,
-                 prev_dimension_subtree:'RangeTreeNode'=None) -> None:
+                 next_dimension_subtree:'RangeTreeNode'=None) -> None:
         self._node_info = node_info
         self._l_child = left_child
         if left_child:
@@ -24,17 +23,10 @@ class RangeTreeNode:
             self._r_child.set_parent(self)
         
         self._next_dim_subtree = next_dimension_subtree
-        self._prev_dim_subtree = prev_dimension_subtree
         self._p = None
     
     def next_dimension_subtree(self) -> 'RangeTreeNode':
         return self._next_dim_subtree
-    
-    def prev_dimension_subtree(self) -> 'RangeTreeNode':
-        return self._prev_dim_subtree
-    
-    def set_prev_dim_subtree(self, prev_dim_subtree:'RangeTreeNode'):
-        self._prev_dim_subtree = prev_dim_subtree
     
     def dimension(self) -> int:
         return self._node_info.dim()
@@ -150,20 +142,13 @@ class RangeTreeNode:
         
         if self.dimension() > 1:
             raise Exception("Can only convert RangeTreeNodes of the 1st " + \
-                f"dimension into FullNodes. Current dimension: {self.dimension()}")
+                f"dimension into FullNodes. Current dimension: {self.dimension()}.")
         
         loc_dict = {}
         for l_node in self.lower_dim_locations():
             loc_dict[l_node.dim()] = l_node
         
         return FullNode(self.get_dataNode(), loc_dict)
-    
-    def all_locations_str(self) -> str:
-        """
-        Returns:
-            str: string representation of this RangeTreeNode including data and
-                location in every dimension.    """
-        return str(self.to_full_node())
         
     def visualizer_str(self) -> str:
         ret = f"[{str(self.get_location())}]"

@@ -91,7 +91,7 @@ def _merge_matrices(matrix: list[list[SingleDimNode]],
 
 def _merge_lists(
     arr:Union[list[SingleDimNode], list[LocationNode], list[FullNode]], 
-    l:int, m:int, r:int, mode:int, dim:int=None) -> None:
+    l:int, m:int, r:int, mode:int, dim:int=None, on_data:bool=False) -> None:
     """
     Merge function for merge sort. Compare the LocationNode objects in each
     SingleDimNode or the LocationNode objects in each FullNode at dimension dim.
@@ -131,7 +131,10 @@ def _merge_lists(
         
         # Compare based on input:
         # -> Get comparison weights
-        if mode == 1:
+        if on_data:
+            left_weight, right_weight = \
+                left_arr[i].data(), right_arr[j].data()
+        elif mode == 1:
             left_weight, right_weight = \
                 left_arr[i].locationNode(), right_arr[j].locationNode()
         else:
@@ -160,7 +163,7 @@ def _merge_lists(
     
 
 def _merge_sort(arr:Union[list[SingleDimNode], list[FullNode], list[list[SingleDimNode]]],
-                l:int, r:int, mode:int=None, dim:int=None) -> None:
+                l:int, r:int, mode:int=None, dim:int=None, on_data:bool=False) -> None:
     """
     In-place recursive merge sort.
     
@@ -174,15 +177,17 @@ def _merge_sort(arr:Union[list[SingleDimNode], list[FullNode], list[list[SingleD
         r (int): Rightmost index of the subset in this recursive call.
         mode (int): Correlates with one of the three types expected by arr.
             1 -> list[SingleDimNode]
-            2 -> list[FullNode]]
+            2 -> list[FullNode]
             3 -> list[list[SingleDimNode]]
         dim (int, optional): If not None, treat arr as list of FullNode 
             instances to be sorted on this field. Otherwise treat arr as list of
-            SingleDimNodes. """
+            SingleDimNodes.
+        on_data (bool): If true, sort using the data values of the FullNodes.
+            Otherwise, use location (default).  """
             
     if not 1 <= mode <= 3:
         raise InvalidInputException(
-            "mode", mode, "between 1 and 3 (inclusive)", _merge_sort)
+            "mode", mode, "between 1 and 3 (inclusive)", "_merge_sort")
     
     if dim != None: # Ensure that arr is a list of FullNodes
         raise_if_different_types(
@@ -191,39 +196,43 @@ def _merge_sort(arr:Union[list[SingleDimNode], list[FullNode], list[list[SingleD
 
     if l < r:
         m = l + (r - l) // 2
-        _merge_sort(arr, l, m, mode, dim)
-        _merge_sort(arr, m + 1, r, mode, dim)
+        _merge_sort(arr, l, m, mode, dim, on_data)
+        _merge_sort(arr, m + 1, r, mode, dim, on_data)
 
         if mode == 1 or mode == 2:
-            _merge_lists(arr, l, m, r, mode, dim)
+            _merge_lists(arr, l, m, r, mode, dim, on_data)
         else:
             _merge_matrices(arr, l, m, r, dim)
             
-def sort_SingleDimNode_list(unsorted_arr:list[SingleDimNode]) -> None:
+def sort_SingleDimNode_list(unsorted_arr:list[SingleDimNode], on_data:bool=False) -> None:
     """
     Sort a list of SingleDimNodes in place by their LocationNode values.
     
     Args:
         unsorted_arr (list[SingleDimNode]): List of SingleDimNodes to be sorted
-    """
+        on_data (bool): If true, sort using the data values of the FullNodes.
+            Otherwise, use location (default).  """
+    
     if len(unsorted_arr) > 1:
-        _merge_sort(unsorted_arr, 0, len(unsorted_arr) - 1, 1)      
+        _merge_sort(unsorted_arr, 0, len(unsorted_arr) - 1, 1, on_data=on_data)      
 
 
-def sort_FullNode_list(unsorted_arr:list[FullNode], dimension:int) -> None:
+def sort_FullNode_list(unsorted_arr:list[FullNode], dimension:int=-1, on_data:bool=False) -> None:
     """
     Sort a list of SingleDimNodes in place by their LocationNode values.
     
     Args:
         unsorted_arr (list[FullNode]): List of SingleDimNodes to be sorted.
-        dimension (int): The dimension on which to sort unsorted_arr.   """
+        dimension (int): The dimension on which to sort unsorted_arr.
+        on_data (bool): If true, sort using the data values of the FullNodes.
+            Otherwise, use location (default).  """
         
     if len(unsorted_arr) > 1:
         if not 0 < dimension <= unsorted_arr[0].dimensionality():
             raise InvalidDimensionalityException(
                 dimension, unsorted_arr[0].dimensionality())
         
-        _merge_sort(unsorted_arr, 0, len(unsorted_arr) - 1, 2, dimension)
+        _merge_sort(unsorted_arr, 0, len(unsorted_arr) - 1, 2, dimension, on_data)
         
 
 def sort_SingleDimNode_matrix(
