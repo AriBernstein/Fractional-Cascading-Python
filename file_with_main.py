@@ -7,7 +7,7 @@ from RangeTree.RangeTreeVisualization import visualize_range_tree
 
 if __name__ == "__main__":
     # print(rand_unique_ints(10, 10, 20))
-    n = 5
+    n = 3
     dim = 3
     loc_min = 0
     loc_max = 100
@@ -20,9 +20,7 @@ if __name__ == "__main__":
         print(i)
     
     rt = RangeTree(full_nodes, dim)
-    target = 50
-    print(f"Target: {target}")
     
     print(visualize_range_tree(rt))
-    
-    print(rt.query(target))
+    print()
+    print(rt.query(50, 1))

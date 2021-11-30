@@ -11,7 +11,8 @@ class RangeTreeNode:
     def __init__(self, node_info:SingleDimNode, 
                  left_child:'RangeTreeNode'=None,
                  right_child:'RangeTreeNode'=None,
-                 next_dimension_subtree:'RangeTreeNode'=None) -> None:
+                 next_dimension_subtree:'RangeTreeNode'=None,
+                 prev_dimension_subtree:'RangeTreeNode'=None) -> None:
         self._node_info = node_info
         self._l_child = left_child
         if left_child:
@@ -22,10 +23,17 @@ class RangeTreeNode:
             self._r_child.set_parent(self)
         
         self._next_dim_subtree = next_dimension_subtree
+        self._prev_dim_subtree = prev_dimension_subtree
         self._p = None
     
     def next_dimension_subtree(self) -> 'RangeTreeNode':
         return self._next_dim_subtree
+    
+    def prev_dimension_subtree(self) -> 'RangeTreeNode':
+        return self._prev_dim_subtree
+    
+    def set_prev_dim_subtree(self, prev_dim_subtree:'RangeTreeNode'):
+        self._prev_dim_subtree = prev_dim_subtree
     
     def dimension(self) -> int:
         return self._node_info.dim()
