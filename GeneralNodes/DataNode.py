@@ -32,6 +32,9 @@ class DataNode:
     def __str__(self) -> str:
         return str(self._data)
     
+    def __repr__(self) -> str:
+        return str(self)
+    
     def __eq__(self, __o: object) -> bool:
         if isinstance(__o, DataNode):
             return __o.data() == self._data()
