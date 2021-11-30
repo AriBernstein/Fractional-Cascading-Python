@@ -8,7 +8,7 @@ from GeneralNodes.FullNode import FullNode
 
 def rand_unique_ints(
     n:int, range_min:int, range_max:int,
-    insert_one:int=None, insert_two:int=None) -> list[int]:
+    insert_val:int=None, rand_insert_loc:bool=False) -> list[int]:
     """
     Generate a list of random unique integers in a given range.
 
@@ -16,8 +16,11 @@ def rand_unique_ints(
         n (int): Size of the output.
         range_min (int): Smallest possible random value in output (inclusive).
         range_max (int): Largest possible random value in output (exclusive).
-        insert_one, insert_two (int, optional): If not none, place in random
-            location in output.
+        insert_val( int, optional): If not none, place inject into output.
+        rand_insert_loc (bool): If true, place insert_val into random location
+            in output list. Otherwise (default), place at middle index. This
+            way, if used to create a FullNode, its data and location values will
+            be the same integer.
 
     Raises:
         InvalidRandUniqueIntGenerationInput: If input is invalid - ie n is less
@@ -33,9 +36,14 @@ def rand_unique_ints(
     
     ret = sample(range(range_min, range_max), n)
     
-    if insert_one and len(ret) >= 1: ret[0] = insert_one
-    if insert_two and len(ret) >= 2: ret[1] = insert_two
+    
+    if insert_val and rand_insert_loc:
+        ret[len(ret) // 2] = insert_val
+    
     shuffle(ret)
+    
+    if insert_val and not rand_insert_loc:
+        ret[len(ret) // 2] = insert_val
     
     return ret
 
