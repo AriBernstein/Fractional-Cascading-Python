@@ -7,12 +7,12 @@ from RangeTree.RangeTreeVisualization import visualize_range_tree
 
 if __name__ == "__main__":
     # print(rand_unique_ints(10, 10, 20))
-    n = 5
+    n = 11
     dim = 1
     loc_min = 0
     loc_max = 100
-    mins = [6]
-    maxes = [33]
+    mins = [20]
+    maxes = [80]
     
     target = None
     consistent_generation=True
@@ -24,8 +24,10 @@ if __name__ == "__main__":
     
     rt = RangeTree(full_nodes, dim)
     print()
-    print(visualize_range_tree(rt))
+    # print(visualize_range_tree(rt.root().left_child()))
+    print(visualize_range_tree(rt.root()))
     print()
+
     
     
     

@@ -25,13 +25,13 @@ class RangeTree:
     def root(self):
         return self._root
     
-    # def root_in_dimension(self, dimension:int) -> RangeTreeNode:
-    #     if not 1 <= dimension <= self._dimensionality:
-    #         raise InvalidDimensionalityException(dimension, self._dimensionality)
-    #     cur_root = self._root
-    #     while cur_root.dimension() < dimension:
-    #         cur_root = cur_root.next_dimension_subtree()
-    #     return cur_root    
+    def root_by_dimension(self, dimension:int) -> RangeTreeNode:
+        if not 1 <= dimension <= self._dimensionality:
+            raise InvalidDimensionalityException(dimension, self._dimensionality)
+        cur_root = self._root
+        while cur_root.dimension() < dimension:
+            cur_root = cur_root.next_dimension_subtree()
+        return cur_root    
     
     def _build_range_tree(self, 
         cur_subset:list[list[SingleDimNode]], cur_dim:int=1) -> RangeTreeNode:
@@ -124,8 +124,8 @@ class RangeTree:
             return self._query(target, cur_root.right_child(), path, predecessor)
         
     
-    def query(self, target:L, search_dimension:int=1,
-              print_result:bool=False) -> list[SingleDimNode]:
+    def query_range_tree(self, target:L, search_dimension:int=1,
+                         print_result:bool=False) -> list[SingleDimNode]:
         """
         Search RangeTree for a Node at a specific location or its successor 
         should none exist.
@@ -157,7 +157,6 @@ class RangeTree:
         if print_result:
             print(f"Search result for {str(target)}:\n{ret_node.all_locations_str()}")
             
-        
         ret_list = []
         while ret_node is not None:
             ret_list.append(ret_node.get_single_dim_node())
@@ -185,12 +184,12 @@ class RangeTree:
         paths_diverge = range_min_node != range_max_node
         paths_diverge_index = 0
         
-        # Find split_node (node at which lowRange & highRange paths diverge)
+        # Find index index at which range_min_path & range_max_path diverges.
         if paths_diverge:
             shortest_path_len = min(len(range_min_path), len(range_max_path))
             for i in range(shortest_path_len):
                 min_direction, min_node = range_min_path[i]
-                max_direction, max_node = range_max_path[i] 
+                max_direction, max_node = range_max_path[i]
                 
                 if min_node.is_leaf() or max_node.is_leaf():
                     break
@@ -199,8 +198,7 @@ class RangeTree:
                 else:
                     break
         else:
-            paths_diverge_index = len(range_min_path) - 2
-            
+            paths_diverge_index = len(range_min_path) - 2             
             
         # Lists of RangeTreeNodes representing canonical subsets
         # -> If current dimension is less than dimensionality, recurse on each.
@@ -242,7 +240,7 @@ class RangeTree:
                     canonical_subsets.append(subtree)
             else:
                 for i in range(paths_diverge_index + 1, len(range_max_path)):
-                    direction, subtree = range_min_path[i]
+                    direction, subtree = range_max_path[i]
                     
                     if subtree.is_leaf() and in_range(subtree.get_location()):
                         canonical_subsets.append(subtree)
@@ -258,7 +256,7 @@ class RangeTree:
                 canonical_subsets = []
         
         # Recurse on next dimension on each canonical subset
-        # -> nodesInRange should contain the RangeTreeNodes that make up the
+        # -> nodes_in_range should contain the RangeTreeNodes that make up the
         #    canonical subsets of the final dimension.
         nodes_in_range = []
         if cur_dim < self._dimensionality:
@@ -270,7 +268,7 @@ class RangeTree:
         else:
             nodes_in_range = canonical_subsets
         
-        return canonical_subsets
+        return nodes_in_range
         
         
     def orthogonal_range_search(self,
