@@ -1,5 +1,6 @@
 from typing import Union
 from GeneralNodes.DataNode import DataNode
+from GeneralNodes.FullNode import FullNode
 from GeneralNodes.LocationNode import LocationNode
 from GeneralNodes.SingleDimNode import SingleDimNode
 from Utils.GeneralUtils import pretty_list
@@ -113,37 +114,63 @@ class RangeTreeNode:
         return leaf_list
     
     
-    def lower_dim_locations(self) -> list[LocationNode]:
+    def lower_dim_locations(self, visual_only=False) -> list[Union[LocationNode, str]]:
         """
+        Args:
+            visual_only (bool): If true return list of locations denoted as 
+                strings. Only useful for visualization purposes. Otherwise
+                (default) return list of LocationNodes.
+        
         Returns:
             list[LocationNode]: List of LocationNode instances, each correlating
                 with a location of this RangeTreeNode in a different demension.
-        """
-        locs = [self.get_locationNode().visualizer_str()]
+                Inclusive of current dimension. """
+        
+        locs = [self.get_locationNode().visualizer_str()] \
+            if visual_only else [self.get_locationNode()]
+
         next_dim_root = self.next_dimension_subtree()
+
         while next_dim_root != None:
-            locs.append(next_dim_root.get_locationNode().visualizer_str())
+            if visual_only:
+                locs.append(next_dim_root.get_locationNode().visualizer_str())
+            else:
+                locs.append(next_dim_root.get_locationNode())
             next_dim_root = next_dim_root.next_dimension_subtree()
         return locs
-    
+
+    def to_full_node(self) -> FullNode:
+        """
+        Convert RangeTreeNode in first dimension into FullNode.
+
+        Raises:
+            Exception: Exception if current RangeTreeNode is not of dimension 1.
+
+        Returns:
+            FullNode: Containing this LocationNode's data and locations.    """
+        
+        if self.dimension() > 1:
+            raise Exception("Can only convert RangeTreeNodes of the 1st " + \
+                f"dimension into FullNodes. Current dimension: {self.dimension()}")
+        
+        loc_dict = {}
+        for l_node in self.lower_dim_locations():
+            loc_dict[l_node.dim()] = l_node
+        
+        return FullNode(self.get_dataNode(), loc_dict)
     
     def all_locations_str(self) -> str:
         """
         Returns:
             str: string representation of this RangeTreeNode including data and
                 location in every dimension.    """
-        
-        ret = f"Data: {self.get_data()}, Location:\n"
-        for loc_node in self.lower_dim_locations():
-            ret += f"\t{loc_node}\n"
-        return ret
-    
+        return str(self.to_full_node())
         
     def visualizer_str(self) -> str:
         ret = f"[{str(self.get_data())}]"
         
         if self.is_leaf():
-            return f"{ret} - {pretty_list(self.lower_dim_locations())}"
+            return f"{ret} - {pretty_list(self.lower_dim_locations(visual_only=True))}"
         
         return ret + f" {pretty_list(self.get_leaves(mode=6), '(', ')')}"
     
