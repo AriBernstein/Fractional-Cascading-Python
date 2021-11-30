@@ -1,4 +1,4 @@
-from random import sample, shuffle
+import random
 
 from Utils.CustomExceptions import InvalidRandUniqueIntGenerationInput
 from GeneralNodes.DataNode import DataNode
@@ -7,8 +7,10 @@ from GeneralNodes.FullNode import FullNode
 
 
 def rand_unique_ints(
-    n:int, range_min:int, range_max:int,
-    insert_val:int=None, rand_insert_loc:bool=False) -> list[int]:
+        n:int, range_min:int, range_max:int,
+        insert_val:int=None, rand_insert_loc:bool=False,
+        random_seed:int=None
+    ) -> list[int]:
     """
     Generate a list of random unique integers in a given range.
 
@@ -16,11 +18,14 @@ def rand_unique_ints(
         n (int): Size of the output.
         range_min (int): Smallest possible random value in output (inclusive).
         range_max (int): Largest possible random value in output (exclusive).
-        insert_val( int, optional): If not none, place inject into output.
+        insert_val (int, optional): If not none, place inject into output.
         rand_insert_loc (bool): If true, place insert_val into random location
             in output list. Otherwise (default), place at middle index. This
             way, if used to create a FullNode, its data and location values will
             be the same integer.
+        random_seed (int, optional): If not None, use specific seed to generate
+            random integers. Otherwise (default), use the random library's
+            default.
 
     Raises:
         InvalidRandUniqueIntGenerationInput: If input is invalid - ie n is less
@@ -34,13 +39,16 @@ def rand_unique_ints(
     if range_max - range_min < n or n <= 0 or range_min < 0 or range_max < 0:
         raise InvalidRandUniqueIntGenerationInput(range_min, range_max, n)
     
-    ret = sample(range(range_min, range_max), n)
+    if random_seed is not None:
+        random.seed(random_seed)
+    
+    ret = random.sample(range(range_min, range_max), n)
     
     
     if insert_val and rand_insert_loc:
         ret[len(ret) // 2] = insert_val
     
-    shuffle(ret)
+    random.shuffle(ret)
     
     if insert_val and not rand_insert_loc:
         ret[len(ret) // 2] = insert_val
@@ -49,8 +57,9 @@ def rand_unique_ints(
 
 
 def generate_FullNode_data_set(
-    n:int, dim: int, loc_min:int, loc_max:int, insert_one:int=None,
-    insert_two:int=None, xyz_label:bool=True) -> list[FullNode]:
+        n:int, dim: int, loc_min:int, loc_max:int, insert_val:int=None,
+        rand_insert_loc:bool=False, seed_with_dimension:bool=False,
+        xyz_label:bool=True) -> list[FullNode]:
     
     """
     Generate list of FullNode objects with randomized data and locations.
@@ -66,8 +75,16 @@ def generate_FullNode_data_set(
             location value (inclusive). 
         loc_max (int): The largest integer representing any FullNode's data or
             location value (exclusive).
-        insert_one, insert_two (int, optional): If not none, place in a random
+        insert_val (int, optional): If not none, place in a random
             location in output.
+        rand_insert_loc (bool): If true, place insert_val into random location
+            in output list. Otherwise (default), place at middle index. This
+            way, if used to create a FullNode, its data and location values will
+            be the same integer.
+        seed_with_dimensions (bool, optional): If True, use current dimension as
+            random seed to guarantee consistency for testing. Otherwise
+            (default), use the random library's default.
+            
         xyz_label (bool): If true, and dim is <= 3, then label dimension 1 as 
             'x', dimension 2 as 'y', dimension 3 as 'z' (given that they exist).
 
@@ -77,9 +94,14 @@ def generate_FullNode_data_set(
             loc_min and loc_max.    """
     xyz_dict = {1:'x', 2: 'y', 3: 'z'}
     
-    node_data_matrix = [    # dim + 1 -> extra integer for data
-        rand_unique_ints(n, loc_min, loc_max, insert_one, insert_two)
-    for _ in range(dim + 1)]
+    node_data_matrix = []
+    for i in range(dim + 1):    # dim + 1 -> extra integer for data
+        node_data_matrix.append(
+            rand_unique_ints(n, loc_min, loc_max, insert_val, rand_insert_loc,
+                             random_seed=i if seed_with_dimension else None))
+    # node_data_matrix = [    
+    #     rand_unique_ints(n, loc_min, loc_max, insert_val, rand_insert_loc, random_seed)
+    # for _ in range(dim + 1)]
     
     node_list = []
 
