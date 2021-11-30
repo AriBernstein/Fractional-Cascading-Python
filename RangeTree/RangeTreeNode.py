@@ -75,7 +75,8 @@ class RangeTreeNode:
     def is_leaf(self) -> bool:
         return self._l_child == None and self._r_child == None
     
-    def get_leaves(self, mode:int=1) -> list:
+    def get_leaves(self, mode:int=1) -> list[
+        Union['RangeTreeNode', SingleDimNode, DataNode, D, LocationNode, L]]:
         """
         Recursive DFS to return all of the leaves in this subtree.
 
@@ -104,12 +105,10 @@ class RangeTreeNode:
         leaf_list = []
         
         if self._l_child:
-            leaf_list.extend(
-                self._l_child.get_leaves(mode))
+            leaf_list.extend(self._l_child.get_leaves(mode))
             
         if self._r_child:
-            leaf_list.extend(
-                self._r_child.get_leaves(mode))
+            leaf_list.extend(self._r_child.get_leaves(mode))
         
         return leaf_list
     
@@ -167,10 +166,11 @@ class RangeTreeNode:
         return str(self.to_full_node())
         
     def visualizer_str(self) -> str:
-        ret = f"[{str(self.get_data())}]"
+        ret = f"[{str(self.get_location())}]"
         
         if self.is_leaf():
-            return f"{ret} - {pretty_list(self.lower_dim_locations(visual_only=True))}"
+            return f"{ret} - Data: {str(self.get_data())}, " + \
+                f"{pretty_list(self.lower_dim_locations(visual_only=True))}"
         
         return ret + f" {pretty_list(self.get_leaves(mode=6), '(', ')')}"
     
@@ -179,7 +179,8 @@ class RangeTreeNode:
     
     def __repr__(self) -> str:
         return str(self)
-            
+    
+    # Comparisons are in the context of location, not data.
     def __eq__(self, __o: object) -> bool:
         if isinstance(__o, RangeTreeNode):
             return self.get_locationNode() == __o.get_locationNode()

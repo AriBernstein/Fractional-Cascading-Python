@@ -25,6 +25,14 @@ class RangeTree:
     def root(self):
         return self._root
     
+    # def root_in_dimension(self, dimension:int) -> RangeTreeNode:
+    #     if not 1 <= dimension <= self._dimensionality:
+    #         raise InvalidDimensionalityException(dimension, self._dimensionality)
+    #     cur_root = self._root
+    #     while cur_root.dimension() < dimension:
+    #         cur_root = cur_root.next_dimension_subtree()
+    #     return cur_root    
+    
     def _build_range_tree(self, 
         cur_subset:list[list[SingleDimNode]], cur_dim:int=1) -> RangeTreeNode:
         """
@@ -52,12 +60,13 @@ class RangeTree:
                 next_dim_subtree.set_prev_dim_subtree(this_leaf)
             
             return this_leaf
-                
+        
+        # Always sort
         sort_SingleDimNode_matrix(cur_subset, cur_dim)
         
         l_index = 0
         r_index = len(cur_subset[cur_dim - 1]) - 1
-        m_index = l_index + (r_index - l_index) // 2
+        m_index = r_index // 2
         
         l_subset = matrix_subset(cur_subset, l_index, m_index)
         r_subset = matrix_subset(cur_subset, m_index + 1, r_index)
@@ -76,9 +85,12 @@ class RangeTree:
     
     def _query(self, target:L, cur_root:RangeTreeNode,
                path:list[tuple[int, RangeTreeNode]]=None,
-               successor=False) -> RangeTreeNode:
+               predecessor=False) -> RangeTreeNode:
         """
         Search RangeTree for a specific Node or its predecessor/successor. 
+        (Defaults to successor.)
+        
+        TODO Implement predecessor functionality
 
         Args:
             target (L): The Location value of the RangeTreeNode for which we are
@@ -100,46 +112,51 @@ class RangeTree:
         # TODO: Implement successor (currently defaults to predecessor)
         
         if cur_root.is_leaf():
-            if not path is None: path.append((-1, cur_root))
+            if path != None: path.append((-1, cur_root))
             return cur_root
         
         elif target <= cur_root.get_location():
-            if not path is None: path.append((LEFT, cur_root))
-            return self._query(target, cur_root.left_child(), path, successor)
-        
+            if path != None: path.append((LEFT, cur_root))
+            return self._query(target, cur_root.left_child(), path, predecessor)
+
         else:
-            if not path is None: path.append((RIGHT, cur_root))
-            return self._query(target, cur_root.right_child(), path, successor)
+            if path != None: path.append((RIGHT, cur_root))
+            return self._query(target, cur_root.right_child(), path, predecessor)
         
     
-    def query(self, target:L, search_dimension:int=1) -> list[SingleDimNode]:
+    def query(self, target:L, search_dimension:int=1,
+              print_result:bool=False) -> list[SingleDimNode]:
         """
-        Search RangeTree for a specific Node or its predecessor/successor. 
+        Search RangeTree for a Node at a specific location or its successor 
+        should none exist.
 
         Args:
             target (L): The Location value of the RangeTreeNode for which we are
                 searching.
             search_dimension (int): The demension in which to search for nodes 
                 at this location. Defaults to 1.
+            print_result (bool): If True, print search result. Default False.
 
         Returns:
             list[SingleDimNode]: A list of SingleDimNodes, each representing a
-                the data's location in a different dimension.
-        """
+                the data's location in a different dimension.   """
+                
         if not (1 <= search_dimension <= self._dimensionality):
             raise InvalidDimensionalityException(search_dimension,
                                                  self._dimensionality)
-            
-        cur_root = self._root
+        
+        cur_root = self._root   # Walk to search_dimension
         while cur_root.dimension() < search_dimension:
             cur_root = cur_root.next_dimension_subtree()
-        print("HELLOOO")
-        print(cur_root)
         
         ret_node = self._query(target, cur_root)
-        while ret_node.dimension() > 1:
-            print("HERE")
-            ret_node = ret_node.prev_dimension_subtree()
+
+        # while ret_node.dimension() > 1: # Walk back to first dimension
+        #     ret_node = ret_node.prev_dimension_subtree()
+        
+        if print_result:
+            print(f"Search result for {str(target)}:\n{ret_node.all_locations_str()}")
+            
         
         ret_list = []
         while ret_node is not None:
@@ -147,10 +164,11 @@ class RangeTree:
             ret_node = ret_node.next_dimension_subtree()
         
         return ret_list
-            
-    def _range_search_rec_helper(
-        self, cur_root:RangeTreeNode, cur_dim:int, range_mins:list[type[L]],
-        range_maxes:list[type[L]]) -> list[RangeTreeNode]:
+    
+    
+    def _search_rec(
+        self, cur_root:RangeTreeNode, cur_dim:int, 
+        range_mins:list[type[L]], range_maxes:list[type[L]]) -> list[RangeTreeNode]:
         
         range_min, range_max = range_mins[cur_dim - 1], range_maxes[cur_dim - 1] 
         
@@ -171,12 +189,12 @@ class RangeTree:
         if paths_diverge:
             shortest_path_len = min(len(range_min_path), len(range_max_path))
             for i in range(shortest_path_len):
-                cur_min_direction, cur_min_node = range_min_path[i]
-                cur_max_direction, cur_max_node = range_max_path[i] 
+                min_direction, min_node = range_min_path[i]
+                max_direction, max_node = range_max_path[i] 
                 
-                if cur_min_node.is_leaf() or cur_max_node.is_leaf():
+                if min_node.is_leaf() or max_node.is_leaf():
                     break
-                elif cur_min_direction == cur_max_direction:
+                elif min_direction == max_direction:
                     paths_diverge_index = i + 1
                 else:
                     break
@@ -210,9 +228,7 @@ class RangeTree:
                 # Regular case
                 elif direction == LEFT and subtree.right_child() is not None:
                     canonical_subsets.append(subtree.right_child())                    
-                else:
-                    # TODO - add exception
-                    raise Exception("WTF")
+
                             
         # Handle high range
         # -> Ensure that paths aren't identical (ie all of the work hasn't 
@@ -232,9 +248,7 @@ class RangeTree:
                         canonical_subsets.append(subtree)
                     elif direction == RIGHT and subtree.left_child() is not None:
                         canonical_subsets.append(subtree.left_child())                    
-                    else:
-                    # TODO - add exception
-                        raise Exception("WTF")
+
         
         # Handle case where no nodes are in range:
         # TODO - add predecessor/successor settings and only perform this step 
@@ -250,14 +264,13 @@ class RangeTree:
         if cur_dim < self._dimensionality:
             for canonical_root in canonical_subsets:
                 nodes_in_range.extend(
-                    self._range_search_rec_helper(
+                    self._search_rec(
                         canonical_root.next_dimension_subtree(),
                         cur_dim + 1, range_mins, range_maxes))
         else:
             nodes_in_range = canonical_subsets
         
         return canonical_subsets
-        
         
         
     def orthogonal_range_search(self,
@@ -267,7 +280,7 @@ class RangeTree:
         # Find canonical subsets from final dimension, extract and combine lists
         # of RangeTreeNodes
         canonical_subsets_in_range = \
-            self._range_search_rec_helper(self._root, 1, range_mins, range_maxes)
+            self._search_rec(self._root, 1, range_mins, range_maxes)
         
         nodes_in_search_range = []
         for range_tree_node in canonical_subsets_in_range:

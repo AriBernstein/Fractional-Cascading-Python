@@ -7,20 +7,29 @@ from RangeTree.RangeTreeVisualization import visualize_range_tree
 
 if __name__ == "__main__":
     # print(rand_unique_ints(10, 10, 20))
-    n = 3
-    dim = 3
+    n = 5
+    dim = 1
     loc_min = 0
     loc_max = 100
-    mins = [25, 25, 25]
-    maxes = [75, 75, 75]
+    mins = [6]
+    maxes = [33]
     
-    full_nodes = generate_FullNode_data_set(n, dim, loc_min, loc_max, 50)
-    
+    target = None
+    consistent_generation=True
+    full_nodes = generate_FullNode_data_set(n, dim, loc_min, loc_max, target, False, consistent_generation)
+
+
     for i in full_nodes:
         print(i)
     
     rt = RangeTree(full_nodes, dim)
-    
+    print()
     print(visualize_range_tree(rt))
     print()
-    print(rt.query(50, 1))
+    
+    
+    
+    range_q = rt.orthogonal_range_search(mins, maxes)
+    print(f"Mins: {mins}, Maxes: {maxes}")
+    for i in range_q:
+        print(i.all_locations_str() + "\n")
