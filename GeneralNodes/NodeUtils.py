@@ -240,6 +240,6 @@ def sort_SingleDimNode_matrix(
     if not 0 < dimension <= len(unsorted_matrix):
         raise InvalidDimensionalityException(dimension, len(unsorted_matrix))
     
-    if len(unsorted_matrix) > 1 and len(unsorted_matrix[0]) > 1:
+    if len(unsorted_matrix) >= 1 and len(unsorted_matrix[0]) > 1:
         _merge_sort(unsorted_matrix, 0, len(unsorted_matrix[0]) - 1, 3, dimension)
   
