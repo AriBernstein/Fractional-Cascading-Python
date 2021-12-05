@@ -164,7 +164,7 @@ class RangeTree:
                 data's location in all dimensions including and following
                 search_dimension.   """
                 
-        if not (1 <= search_dimension <= self._dimensionality):
+        if not 1 <= search_dimension <= self._dimensionality:
             raise InvalidDimensionalityException(search_dimension,
                                                  self._dimensionality)
         

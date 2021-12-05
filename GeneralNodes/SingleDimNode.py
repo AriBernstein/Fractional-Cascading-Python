@@ -34,3 +34,6 @@ class SingleDimNode:
         if isinstance(__o, SingleDimNode):
             return __o.data() == self._data and __o.locationNode() == self._loc
         return False
+    
+    def __hash__(self) -> int:
+        return hash(str(self.dim()) + str(self.loc()))
