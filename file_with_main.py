@@ -1,7 +1,7 @@
 from GeneralNodes.NodeUtils import fullNode_list_to_SingleDimNode_matrix, \
     sort_SingleDimNode_list, sort_FullNode_list, sort_SingleDimNode_matrix
 from GeneralNodes.NodeGenerationUtils import generate_FullNode_data_set
-from Utils.GeneralUtils import ColIterator, StringContainer, matrix_subset, pretty_list
+from Utils.GeneralUtils import ColIterator, StringContainer, matrix_col_subset, pretty_list
 from RangeTree.RangeTree import RangeTree
 from RangeTree.RangeTreeVisualization import visualize_range_tree
 

@@ -103,12 +103,12 @@ def matrix_col_subset(matrix:Iterator[Iterator[object]],
 
 ################### Utils for Pretty Printing Data Structures ##################
 def pretty_list(l:Iterable, opening_brace:chr='[', closing_brace:chr=']',
-                left_indent_len=0, line_len_limit=None) -> str:
+                delim:str=",", left_indent_len=0, line_len_limit=None) -> str:
     
     ret = f"{' ' * left_indent_len}{opening_brace}" 
     line_len = initial_len = len(ret)
     for e in l:
-        new_elem_str = f"{e}, "
+        new_elem_str = f"{e}{delim} "
         
         if line_len_limit:
             line_len += len(new_elem_str)

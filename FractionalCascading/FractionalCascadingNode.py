@@ -35,13 +35,11 @@ class FCNode:
             If promoted, pointer to the the FCNode representing this base node
             in _cur_dim + 1. Otherwise None (default).
             
-        _l_list_neighbor (FCNode):
-            Pointer to current node's left (lower) neighbor in the linked list.
+        _l_list_neighbor (FCNode), _r_list_neighbor (FCNode):
+            Pointer to current node's left (lower) neighbor and right (higher) 
+            neighbor respectively in the linked list.
             
-        _r_list_neighbor (FCNode):
-            Pointer to current node's right (higher) neighbor in the linked list.
-            
-        _l_promotional_neighbor, (FCNode), _r_promotional_neighbor (FCNode):
+        _l_fc_neighbor, (FCNode), _r_fc_neighbor (FCNode):
             Nodes in fractional cascading data structures store pointers to the 
             nearest preceding and proceeding nodes in the current dimension with 
             opposite promotional statuses to the current.   """
@@ -59,20 +57,32 @@ class FCNode:
         self._l_list_neighbor = left_list_neighbor
         self._r_list_neighbor = right_list_neighbor
         
-        self._l_promotional_neighbor = None
-        self._r_promotional_neighbor = None
+        self._l_fc_neighbor = None
+        self._r_fc_neighbor = None
     
-    def prev_node(self) -> 'FCNode':
+    def prev_list_neighbor(self) -> 'FCNode':
         return self._l_list_neighbor
     
-    def set_prev_node(self, new_prev:'FCNode') -> None:
+    def set_prev_neighbor(self, new_prev:'FCNode') -> None:
         self._l_list_neighbor = new_prev
     
-    def next_node(self) -> 'FCNode':
+    def next_list_neighbor(self) -> 'FCNode':
         return self._r_list_neighbor
     
-    def set_next_node(self, new_next:'FCNode') -> None:
+    def set_next_list_neighbor(self, new_next:'FCNode') -> None:
         self._r_list_neighbor = new_next
+        
+    def prev_fc_neighbor(self) -> 'FCNode':
+        return self._l_fc_neighbor
+    
+    def set_prev_fc_neighbor(self, left_fc_neighbor:'FCNode') -> None:
+        self._l_fc_neighbor = left_fc_neighbor
+                
+    def next_fc_neighbor(self) -> 'FCNode':
+        return self._r_fc_neighbor
+    
+    def set_next_fc_neighbor(self, right_fc_neighbor:'FCNode') -> None:
+        self._r_fc_neighbor = right_fc_neighbor
     
     def copy(self) -> 'FCNode':
         return FCNode(
@@ -84,14 +94,14 @@ class FCNode:
     def promote(self) -> 'FCNode':
         return FCNode(
             base_node=self._base_node,
-            dimension=self._cur_dim + 1, 
+            dimension=self._cur_dim - 1, 
             higher_dim_variant=self)
     
-    def local(self) -> bool:
+    def is_local(self) -> bool:
         return self.initial_dim() == self._cur_dim
     
-    def promoted(self) -> bool: 
-        return not self.local()
+    def is_promoted(self) -> bool: 
+        return not self.is_local()
     
     def base_node(self) -> SingleDimNode:
         return self._base_node
@@ -170,7 +180,7 @@ class FCNodeList:
         
         while cur_link is not None:
             fc_node_list.append(cur_link)
-            cur_link = cur_link.next_node()
+            cur_link = cur_link.next_list_neighbor()
         
         return fc_node_list
     
@@ -183,10 +193,9 @@ class FCNodeList:
         if self._n == 0:
             self._list_head = self._list_tail = fc_node
         else:            
-            self._list_tail.set_next_node(fc_node)
-            fc_node.set_prev_node(self._list_tail)
+            self._list_tail.set_next_list_neighbor(fc_node)
+            fc_node.set_prev_neighbor(self._list_tail)
             self._list_tail = fc_node
-        
         self._n += 1
     
     def append_left(self, fc_node:FCNode) -> None:
@@ -197,10 +206,32 @@ class FCNodeList:
         if self._n == 0:
             self._list_head = self._list_tail = fc_node
         else:
-            self._list_head.set_prev_node(fc_node)
-            fc_node.set_next_node(self._list_head)
+            self._list_head.set_prev_neighbor(fc_node)
+            fc_node.set_next_list_neighbor(self._list_head)
             self._list_head = fc_node
         self._n += 1
+        
+        
+    def get_promoted_subset(self) -> 'FCNodeList':
+        add_node = True
+        subset, subset_pointer = FCNodeList(), self._list_head
+        while(subset_pointer is not None):
+            if add_node:
+                subset.append(subset_pointer.promote())
+                add_node = False
+            else:
+                add_node = True
+                
+            subset_pointer = subset_pointer.next_list_neighbor()
+        return subset
+        
+        
+    def copy(self) -> 'FCNodeList':
+        cp, cp_pointer = FCNodeList(), self._list_head        
+        while cp_pointer is not None:
+            cp.append(cp_pointer.copy())
+            cp_pointer = cp_pointer.next_list_neighbor()
+        return cp
     
     def __len__(self) -> int:
         return self._n
