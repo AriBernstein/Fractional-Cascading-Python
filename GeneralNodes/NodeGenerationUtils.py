@@ -55,7 +55,6 @@ def rand_unique_ints(
     
     ret = random.sample(range(range_min, range_max), n)
     
-    
     if insert_val and rand_insert_loc:
         ret[len(ret) // 2] = insert_val
     
@@ -124,10 +123,6 @@ def generate_FullNode_data_set(
         node_data_matrix.append(
             rand_unique_ints(n, loc_min, loc_max, insert_val, rand_insert_loc,
                              random_seed=i if seed_with_dimension else None))
-    # node_data_matrix = [    
-    #     rand_unique_ints(n, loc_min, loc_max, insert_val, rand_insert_loc, random_seed)
-    # for _ in range(dim + 1)]
-    
     node_list = []
 
     # Iterate through node_data_matrix column-wise to create FullNodes one at a

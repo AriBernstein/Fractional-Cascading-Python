@@ -5,7 +5,7 @@ from GeneralNodes.NodeUtils import fullNode_list_to_SingleDimNode_matrix, \
 from GeneralNodes.SingleDimNode import SingleDimNode
 from RangeTree.RangeTreeNode import RangeTreeNode
 from Utils.CustomExceptions import InvalidDimensionalityException
-from Utils.GeneralUtils import matrix_subset
+from Utils.GeneralUtils import matrix_col_subset
 from Utils.TypeUtils import L
 
 LEFT, RIGHT = 0, 1
@@ -21,7 +21,6 @@ class RangeTree:
             Dimensionality of the data set represented by this Range Tree.
         
         _root (RangeTreeNode): the root node of the Range Tree. """
-        
     
     def __init__(self, data_set:list[FullNode], dimensionality:int) -> None:
         """
@@ -29,8 +28,7 @@ class RangeTree:
             data_set (list[FullNode]): 
                 List of FullNode instances to be preprocessed into Range Tree.
             
-            dimensionality (int): 
-                The Dimensionality of data_set. """
+            dimensionality (int): The Dimensionality of data_set. """
         
         if len(data_set) == 0:
             raise Exception("data_set is empty. Cannot construct RangeTree.")
@@ -41,9 +39,11 @@ class RangeTree:
         self._dimensionality = dimensionality
         self._root = self._build_range_tree(
             fullNode_list_to_SingleDimNode_matrix(data_set))
+    
         
     def root(self):
         return self._root
+    
     
     def root_by_dimension(self, dimension:int) -> RangeTreeNode:
         """
@@ -59,6 +59,7 @@ class RangeTree:
         while cur_root.dimension() < dimension:
             cur_root = cur_root.next_dimension_subtree()
         return cur_root    
+    
     
     def _build_range_tree(self, 
         cur_subset:list[list[SingleDimNode]], cur_dim:int=1) -> RangeTreeNode:
@@ -92,8 +93,8 @@ class RangeTree:
         r_index = len(cur_subset[cur_dim - 1]) - 1
         m_index = r_index // 2
         
-        l_subset = matrix_subset(cur_subset, l_index, m_index)
-        r_subset = matrix_subset(cur_subset, m_index + 1, r_index)
+        l_subset = matrix_col_subset(cur_subset, l_index, m_index)
+        r_subset = matrix_col_subset(cur_subset, m_index + 1, r_index)
                     
         this_root = RangeTreeNode(
             node_data=l_subset[cur_dim - 1][-1],
@@ -147,6 +148,7 @@ class RangeTree:
         else:
             return handle_left() \
                 if target <= cur_root.get_location() else handle_right()
+    
     
     def query_range_tree(self, target:L, search_dimension:int=1,
                          print_result:bool=False,

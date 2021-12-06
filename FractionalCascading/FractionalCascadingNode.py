@@ -4,7 +4,7 @@ from GeneralNodes.SingleDimNode import SingleDimNode
 class FCNode:
     
     """
-    Vocabulary - given a node x in a list k: 
+    Vocabulary -> given a node x in a list k: 
         FCNode: Stands for Fractional Cascading Node
         
         Promoted: 
@@ -13,7 +13,7 @@ class FCNode:
             
         Local:
             If x was initially of dimension k st it does not exist in any higher
-            dimensions, it is considered "Local".
+            dimensions, it is considered "Local". (Opposite of promoted.)
             
         Left, Right:
             Nodes to the left & right of x share a current dimension value and 
@@ -30,44 +30,52 @@ class FCNode:
             instantiated or promoted into. If None, defaults to location of the
             given _base_node upon instantiation.
             
-        _higher_dim_fc_node (FCNode):
-            If promoted, pointer to the the FCNode representing
-            this base node in _cur_dim + 1. Otherwise None (default).
+        _higher_dim_variant (FCNode):
+            If promoted, pointer to the the FCNode representing this base node
+            in _cur_dim + 1. Otherwise None (default).
             
-        _left_list_neighbor (FCNode):
+        _l_list_neighbor (FCNode):
             Pointer to current node's left (lower) neighbor in the linked list.
             
-        _right_list_neighbor (FCNode): Pointer to current node's
-            right (higher) neighbor in the linked list.
+        _r_list_neighbor (FCNode):
+            Pointer to current node's right (higher) neighbor in the linked list.
             
-        _left_promotional_neighbor (FCNode):
-            Pointer to the closest FCNode in the linked list that is:
-                
-                1.  "Left" of current node.
-                2.  "Promoted" if current node is "local", "local" if current node is promoted.
-            
-        _right_promotional_neighbor (FCNode): Pointer to the 
-            closest FCNode in the linked list that is:
-            
-                1.  "Right" of current node.
-                2.  "Promoted" if current node is "local",  or "local" if current node is promoted.   """
-    
-    def __init__(self, base_node:SingleDimNode,
-                 dimension:int=None,
+        _l_promotional_neighbor, (FCNode), _r_promotional_neighbor (FCNode):
+            Nodes in fractional cascading data structures store pointers to the 
+            nearest preceding and proceeding nodes in the current dimension with 
+            opposite promotional statuses to the current.   """
+ 
+    def __init__(self, base_node:SingleDimNode, dimension:int=None,
                  left_list_neighbor:'FCNode'=None,
                  right_list_neighbor:'FCNode'=None,
-                 higher_dim_fc_node:'FCNode'=None) -> None:
+                 higher_dim_variant:'FCNode'=None) -> None:
         
         self._base_node = base_node
         self._cur_dim = dimension if dimension is not None else base_node.dim()
         
-        self._higher_dim_fc_node = higher_dim_fc_node
+        self._higher_dim_variant = higher_dim_variant
         
-        self._left_list_neighbor = left_list_neighbor
-        self._right_list_neighbor = right_list_neighbor
+        self._l_list_neighbor = left_list_neighbor
+        self._r_list_neighbor = right_list_neighbor
         
-        self._left_promotional_neighbor = None
-        self._right_promotional_neighbor = None
+        self._l_promotional_neighbor = None
+        self._r_promotional_neighbor = None
+        
+    def copy(self) -> 'FCNode':
+        return FCNode(
+            base_node=self._base_node, dimension=self._cur_dim,
+            left_list_neighbor=self._l_list_neighbor,
+            right_list_neighbor=self._r_list_neighbor, 
+            higher_dim_variant=self._higher_dim_variant
+        )
+        
+    def promote(self) -> 'FCNode':
+        return FCNode(
+            base_node=self._base_node,
+            dimension=self._cur_dim + 1, 
+            higher_dim_variant=self
+        )
+        
     
     def local(self) -> bool:
         return self.initial_dim() == self._cur_dim
@@ -82,13 +90,13 @@ class FCNode:
         return self._cur_dim
     
     def prev_dim(self) -> int:
-        return self._higher_dim_fc_node.current_dim()
+        return self._higher_dim_variant.current_dim()
     
     def initial_dim(self) -> int:
         return self._base_node.dim()
     
     def set_higher_dim_fc_node(self, hd_node:'FCNode') -> None:
-        self._higher_dim_fc_node = hd_node
+        self._higher_dim_variant = hd_node
         
     def location(self) -> LocationNode:
         return self._base_node.locationNode()

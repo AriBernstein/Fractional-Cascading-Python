@@ -1,6 +1,6 @@
 from typing import Iterable, Iterator, List
 
-from Utils.CustomExceptions import InvalidTypeException
+from Utils.CustomExceptions import InvalidInputException, InvalidTypeException
 
 class StringContainer:
     
@@ -67,9 +67,38 @@ class ColIterator:
         raise StopIteration
         
 
-def matrix_subset(matrix:Iterator[Iterator[object]], 
-                  l_index:int, r_index:int) -> List[List[object]]:
-    return [sub_list[l_index:r_index + 1] for sub_list in matrix]
+def matrix_col_subset(matrix:Iterator[Iterator[object]],
+                      l_col_index:int, r_col_index:int) -> List[List[object]]:
+    """
+    Return a column-wise subset of the matrix containing columns between 
+    l_col_index & r_col_index (inclusive). 
+    
+    Ex. given the following matrix, l_col_index = 0, r_col_index 2     
+            [1,  2,  3,  4]      [1,  2,  3]
+            [5,  6,  7,  8]  ->  [5,  6,  7]
+            [9, 10, 11, 12]      [9, 10, 11]
+
+    Args:
+        matrix (Iterator[Iterator[object]]): 2D array of any indexable type.
+        
+        l_col_index (int): Inclusive leftmost column subset index.
+        
+        r_col_index (int): Inclusive rightmost column subset index. 
+
+    Returns:
+        List[List[object]]: [description]
+    """
+    if l_col_index < 0:
+        raise InvalidInputException("l_col_index", str(l_col_index), "greater than 0")
+    if r_col_index < 0:
+        raise InvalidInputException("r_col_index", str(l_col_index), "greater than 0")
+    if l_col_index > r_col_index:
+        raise InvalidInputException(
+            "l_col_index & r_col_index", f"l_col_index = {l_col_index}, " + \
+                f"r_col_index = {r_col_index}", "l_col_index to be less " + \
+                    "than or equal to r_col_index")
+
+    return [sub_list[l_col_index:r_col_index + 1] for sub_list in matrix]
 
 
 ################### Utils for Pretty Printing Data Structures ##################
