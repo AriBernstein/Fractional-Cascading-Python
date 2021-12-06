@@ -33,12 +33,17 @@ def _traverse(cur_str:StringContainer, padding:str, pointer:str,
 
     Args:
         cur_str (StringContainer): Visualization thus far.
+        
         padding (str): Left indent.
+        
         pointer (str): Left side for this recursive call.
+        
         cur_root (RangeTreeNode): The current RangeTreeNode.
-        has_right_sibling (bool): If true, then begin horizontal line as a
-            perpendicular line coming out of a vertical line. Otherwise being 
-            horizontal line as a right angle.   """
+        
+        has_right_sibling (bool): 
+            If true, then begin horizontal line as a perpendicular line coming 
+            out of a vertical line. Otherwise being horizontal line as a right 
+            angle.  """
     
     if not cur_root:
         return
@@ -70,11 +75,9 @@ def _traverse_pre_order(cur_root:RangeTreeNode) -> str:
     """
     Helper function to call recursive search methods initially.
 
-    Args:
-        cur_root (RangeTreeNode): The root of the RangeTree.
+    Args cur_root (RangeTreeNode): The root of the RangeTree.
 
-    Returns:
-        str: String visualization of the Range Tree.    """
+    Returns str: String visualization of the Range Tree.    """
         
     if not cur_root:
         return "Empty Range Tree."
@@ -100,20 +103,24 @@ def visualize_range_tree(root:Union[RangeTreeNode, RangeTree],
     Initialize globals and traverse range tree to generate visualization string.
 
     Args:
-        root (Union[RangeTreeNode, RangeTree]): The root of the Range Tree or 
-            the Range Tree itself.
-        vertical_spacing (int, optional): Number of vertical spaces between each 
-            horizontal line. Defaults to 2.
-        indent_per_level (int, optional): Length of horizontal lines outside of 
-            information.
-        safe_chars (bool, optional): If true, use chars that are easier for 
-            consoles to display. Otherwise, use characters that make the 
-            visualization prettier (default).
-        print_tree (bool, optional): If true, print tree to console. Defaults to
-            False.
+        root (Union[RangeTreeNode, RangeTree]): 
+            The root of the Range Tree or the Range Tree itself.
+        
+        vertical_spacing (int, optional): 
+            Number of vertical spaces between each horizontal line (defaults 2).
+        
+        indent_per_level (int, optional): 
+            Length of horizontal lines outside of information.
+            
+        safe_chars (bool, optional): 
+            If true, use chars that are easier for consoles to display. 
+            Otherwise (default), use characters that benefit the visualization 
+            but may be more prone to console printing bugs.
+            
+        print_tree (bool, optional): 
+            If true, print tree to console. (Defaults to False.)
 
-    Returns:
-        str: String visualization of the Range Tree.    """
+    Returns str: String visualization of the Range Tree.    """
     
     # Reset/reassign global graphic variables for visualization
     global _HORIZONTAL_LINE_CHARS, _NOT_LAST_CHILD_POINTER, \

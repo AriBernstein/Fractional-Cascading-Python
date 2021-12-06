@@ -17,12 +17,13 @@ def fullNode_list_to_SingleDimNode_matrix(
     -> Each second-dimensional list represents a single dimension.
     -> Matrix[dimension][SingleDimNode] 
     
-    Args:
-        data_set (list[FullNode]): K-Dimensional data set represented as a list
-            of n FullNodes.
+    Arg data_set (list[FullNode]): 
+        K-Dimensional data set represented as a list of n FullNodes.
+    
     Returns:
-        list[list[SingleDimNode]]: Matrix of SingleDimNodes st each
-            second-dimension list represents a given dimension. """
+        list[list[SingleDimNode]]: 
+            Matrix of SingleDimNodes st each second-dimension list represents a 
+            given dimension.    """
     
     ret_matrix = [[None for _ in range(len(data_set))] \
         for _ in range(data_set[0].dimensionality())]
@@ -46,14 +47,19 @@ def _merge_matrices(matrix: list[list[SingleDimNode]],
     SingleDimNode of dimension dim.
 
     Args:
-        matrix (list[list[SingleDimNode]]): Matrix of SingleDimNodes w/ 
-            each second-dimension list representing a given dimension.
+        matrix (list[list[SingleDimNode]]):
+            Matrix of SingleDimNodes with each second-dimension list 
+            representing a given dimension.
+            
         l (int): Leftmost index of the subset in this recursive call.
+        
         m (int): Middle index of the subset in this recursive call.
+        
         r (int): Rightmost index of the subset in this recursive call.    
-        d (int, optional): If not None, treat arr as list of FullNode instances
-            to be sorted on this field. Otherwise treat arr as list of
-            SingleDimNodes. """
+        
+        d (int, optional):
+            If not None, treat arr as list of FullNode instances to be sorted on 
+            this field. Otherwise treat arr as list of SingleDimNodes.  """
             
     n_dims = len(matrix)    # Number of dimensions.
     
@@ -97,18 +103,23 @@ def _merge_lists(
     SingleDimNode or the LocationNode objects in each FullNode at dimension dim.
 
     Args:
-        arr (Union[list[SingleDimNode], list[FullNode]]): List of SingleDimNodes
-            to be sorted on their location or list of FullNodes to be sorted on 
-            a given dimension.
+        arr (Union[list[SingleDimNode], list[FullNode]]):
+            List of SingleDimNodes to be sorted on their location or list of
+            FullNodes to be sorted on a given dimension.
+        
         l (int): Leftmost index of the subset in this recursive call.
+        
         m (int): Middle index of the subset in this recursive call.
+        
         r (int): Rightmost index of the subset in this recursive call.
+        
         mode (int): Correlates with one of the three types expected by arr.
             1 -> list[SingleDimNode] or list[LocationNode]
             2 -> list[FullNode]]
-        dim (int, optional): If not None, treat arr as list of FullNode 
-            instances to be sorted on this field. Otherwise treat arr as list of
-            SingleDimNodes. """
+        
+        dim (int, optional):
+            If not None, treat arr as list of FullNode instances to be sorted on 
+            this field. Otherwise treat arr as list of SingleDimNodes.  """
     
     if mode != 1 and dim == None:
         raise MissingParameterException(
@@ -168,22 +179,27 @@ def _merge_sort(arr:Union[list[SingleDimNode], list[FullNode], list[list[SingleD
     In-place recursive merge sort.
     
     Args:
-        arr (Union[list[SingleDimNode], list[FullNode], 
-             list[list[SingleDimNode]]):
-                List of SingleDimNodes to be sorted on their location, list of
-                FullNodes to be sorted on a given dimension, or a Matrix of
-                SingleDimNodes to be sorted on a given dimension.
+        arr (Union[list[SingleDimNode], list[FullNode], list[list[SingleDimNode]]):
+            List of SingleDimNodes to be sorted on their location, list of
+            FullNodes to be sorted on a given dimension, or a Matrix of
+            SingleDimNodes to be sorted on a given dimension.
+        
         l (int): Leftmost index of the subset in this recursive call.
+        
         r (int): Rightmost index of the subset in this recursive call.
+        
         mode (int): Correlates with one of the three types expected by arr.
             1 -> list[SingleDimNode]
             2 -> list[FullNode]
             3 -> list[list[SingleDimNode]]
-        dim (int, optional): If not None, treat arr as list of FullNode 
-            instances to be sorted on this field. Otherwise treat arr as list of
-            SingleDimNodes.
-        on_data (bool): If true, sort using the data values of the FullNodes.
-            Otherwise, use location (default).  """
+        
+        dim (int, optional):
+            If not None, treat arr as list of FullNode instances to be sorted on 
+            this field. Otherwise treat arr as list of SingleDimNodes.
+            
+        on_data (bool): 
+            If true, sort using the data values of the FullNodes. Otherwise, use 
+            location (default). """
             
     if not 1 <= mode <= 3:
         raise InvalidInputException(
@@ -210,8 +226,10 @@ def sort_SingleDimNode_list(unsorted_arr:list[SingleDimNode], on_data:bool=False
     
     Args:
         unsorted_arr (list[SingleDimNode]): List of SingleDimNodes to be sorted
-        on_data (bool): If true, sort using the data values of the FullNodes.
-            Otherwise, use location (default).  """
+        
+        on_data (bool): 
+            If true, sort using the data values of the FullNodes. Otherwise, use
+            location (default). """
     
     if len(unsorted_arr) > 1:
         _merge_sort(unsorted_arr, 0, len(unsorted_arr) - 1, 1, on_data=on_data)      
@@ -223,9 +241,12 @@ def sort_FullNode_list(unsorted_arr:list[FullNode], dimension:int=-1, on_data:bo
     
     Args:
         unsorted_arr (list[FullNode]): List of SingleDimNodes to be sorted.
+        
         dimension (int): The dimension on which to sort unsorted_arr.
-        on_data (bool): If true, sort using the data values of the FullNodes.
-            Otherwise, use location (default).  """
+        
+        on_data (bool): 
+            If true, sort using the data values of the FullNodes. Otherwise, use
+            location (default). """
         
     if len(unsorted_arr) > 1:
         if not 0 < dimension <= unsorted_arr[0].dimensionality():
@@ -242,8 +263,9 @@ def sort_SingleDimNode_matrix(
     given dimension.
     
     Args:
-        unsorted_matrix (list[list[SingleDimNode]]): Matrix of SingleDimNodes to
-            be sorted on a given dimension.
+        unsorted_matrix (list[list[SingleDimNode]]): 
+            Matrix of SingleDimNodes to be sorted on a given dimension.
+        
         dimension (int): The dimension on which to sort unsorted_matrix.    """
     
     if not 0 < dimension <= len(unsorted_matrix):

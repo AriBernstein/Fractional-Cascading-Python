@@ -105,13 +105,12 @@ def pad_ints(i:int, n:int) -> str:
 
     Args:
         i (int): integer in to be converted into a string.
+        
         n (int): length of string output.
 
-    Raises:
-        Exception: If i has more digits than n.
+    Raises Exception: If i has more digits than n.
 
-    Returns:
-        str: String containing integer i, front-padded to n characters. """
+    Returns str: String containing integer i, front-padded to n characters. """
     
     i_str = str(i)
     i_len = len(i_str)

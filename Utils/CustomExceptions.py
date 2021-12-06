@@ -54,17 +54,25 @@ def raise_if_equal(obj_a:object, obj_b:object, invert:bool=False,
 
     Args:
         obj_a (object): To be compared with obj_b.
+        
         obj_b (object): To be compared with obj_a.
-        invert (bool, optional): Defaults to False. If true, raise exception if
-            obj_a does not equal obj_b.
-        exception (Type[Exception], optional): Exception type to be raised if
-            obj_a equals obj_b. If None, use default Exception.
-        params (list, optional): List containing parameters to be used when 
-            calling exception constructor.
+        
+        invert (bool, optional): 
+            If true, raise exception if obj_a does not equal obj_b. (Default False)
+
+        exception (Type[Exception], optional): 
+            Exception type to be raised if obj_a equals obj_b. If None
+            (default), use default Exception.
+
+        params (list, optional):
+            List containing parameters to be used when calling exception 
+            constructor.
+        
         type_comparison (bool): If true, use is_instance instead of equality.
 
     Raises:
         exception: Given exception, instantiated via values in params.
+        
         Exception: Default exception if None, instantiated via values in params.
     """
     if exception != None and not \
@@ -92,11 +100,16 @@ def raise_if_not_expected_types(
 
     Args:
         obj (object): To be checked if expected_type.
+        
         expected_type (type): To be checked against obj.
-        exception (Type[Exception], optional): Exception type to be raised if
-            obj_a is not of type expected_type. If None, use default Exception.
-        params (list, optional): List containing parameters to be used when 
-            calling exception constructor.  """
+        
+        exception (Type[Exception], optional): 
+            Exception type to be raised if obj_a is not of type expected_type. 
+            If None, use default Exception.
+        
+        params (list, optional): 
+            List containing parameters to be used when calling given exception.
+    """
     raise_if_equal(obj, expected_type, True, exception, params, True)
 
 
@@ -107,13 +120,20 @@ def raise_if_none(obj:object, exception:Type[Exception]=None, params:tuple=None,
     
     Args:
         obj (object): To be checked if None.
-        exception (Type[Exception], optional): Exception to be raised if obj is
-            None. If None, uses default Exception class.
-        params (tuple, optional): Tuple containing parameters to be used when 
-            calling exception constructor. If None, and empty_params is False,
-            defaults to a string message: "Object does not exist.".
-        empty_params (bool): If true, and params is None, do not instantiate 
-            exception with default messsage.    """
+        
+        exception (Type[Exception], optional): 
+            Exception to be raised if obj is None. If None, uses default
+            Exception class.
+        
+        params (tuple, optional): 
+            Tuple containing parameters to be used when calling exception 
+            constructor. If None, and empty_params is False, defaults to a 
+            string message: "Object does not exist.".
+        
+        empty_params (bool): 
+            If true, and params is None, do not instantiate exception with 
+            default messsage.   """
+            
     if not params and not empty_params:
         params = (f"Object does not exist.")
     

@@ -13,18 +13,23 @@ class RangeTreeNode:
     
     Fields:
         _single_dim_node (SingleDimNode): Stores all data and location objects.
+        
         _l_child (RangeTreeNode): The left child of this RangeTreeNode.
+        
         _r_child (RangeTreeNode): The right child of this RangeTreeNode.
-        _next_dim_subtree (RangeTreeNode): Pointer to a tree with the same data
-            but ordered by the following demension.
+        
+        _next_dim_subtree (RangeTreeNode): 
+            Pointer to a range tree whose root the same data but ordered by the
+            following demension.
+        
         _p (RangeTreeNode): The parent of this RangeTreeNode.   """
     
-    def __init__(self, node_info:SingleDimNode, 
+    def __init__(self, node_data:SingleDimNode, 
                  left_child:'RangeTreeNode'=None,
                  right_child:'RangeTreeNode'=None,
                  next_dimension_subtree:'RangeTreeNode'=None) -> None:
         
-        self._single_dim_node = node_info
+        self._single_dim_node = node_data
         self._l_child = left_child
         if left_child:
             self._l_child.set_parent(self)
@@ -38,14 +43,14 @@ class RangeTreeNode:
     
     def next_dimension_subtree(self) -> 'RangeTreeNode':
         """
-        Returns:
-            RangeTreeNode: Pointer to a tree with the same data but ordered by
-                the following demension.    """
+        Returns RangeTreeNode: 
+            Pointer to a range tree whose root the same data but ordered by the
+            following demension.    """
         
         return self._next_dim_subtree
     
     def dimension(self) -> int:
-        """Returns: the dimension of the location of this RangeTreeNode.  """
+        """Returns int: the dimension of the location of this RangeTreeNode. """
         return self._single_dim_node.dim()
     
     def left_child(self) -> 'RangeTreeNode':        
@@ -89,13 +94,11 @@ class RangeTreeNode:
         """
         Recursive DFS to return all of the leaves in this subtree.
 
-        Args:
-            leaf_list (list[RangeTreeNode]): List of leaves seen so far to be
-                passed between recursive calls.
+        Args leaf_list (list[RangeTreeNode]): 
+            List of leaves seen so far to be passed between recursive calls.
 
-        Returns:
-            list['RangeTreeNode']: List of RangeTreeNodes that are leaves of
-                this subtree.   """
+        Returns list['RangeTreeNode']: 
+            List of RangeTreeNodes that are leaves of this subtree. """
                 
         if self.is_leaf():
             if mode == 1:
@@ -124,15 +127,14 @@ class RangeTreeNode:
     
     def lower_dim_locations(self, visual_only=False) -> list[Union[LocationNode, str]]:
         """
-        Args:
-            visual_only (bool): If true return list of locations denoted as 
-                strings. Only useful for visualization purposes. Otherwise
-                (default) return list of LocationNodes.
+        Args visual_only (bool): 
+            If true return list of locations denoted as strings (visualization 
+            purposes). Otherwise (default) return list of LocationNodes.
         
-        Returns:
-            list[LocationNode]: List of LocationNode instances, each correlating
-                with a location of this RangeTreeNode in a different demension.
-                Inclusive of current dimension. """
+        Returns list[LocationNode]: 
+            List of LocationNode instances, each correlating with a location of
+            this RangeTreeNode in each of the lower demensions, inclusive of 
+            current dimension.  """
         
         locs = [self.get_locationNode().visualizer_str()] \
             if visual_only else [self.get_locationNode()]
@@ -151,12 +153,11 @@ class RangeTreeNode:
         """
         Convert RangeTreeNode in first dimension into FullNode.
 
-        Raises:
-            Exception: Exception if current RangeTreeNode is not of dimension 1.
+        Raises Exception:
+            Exception if current RangeTreeNode is not of dimension 1.
 
-        Returns:
-            FullNode: Containing this LocationNode's data and locations.    """
-        
+        Returns FullNode: Containing this LocationNode's data and locations.
+        """
         if self.dimension() > 1:
             raise Exception("Can only convert RangeTreeNodes of the 1st " + \
                 f"dimension into FullNodes. Current dimension: {self.dimension()}.")
@@ -169,8 +170,8 @@ class RangeTreeNode:
         
     def visualizer_str(self) -> str:
         """
-        Returns:
-            str: String meant as a component of RangeTree visualization.    """
+        Returns str: String meant as a component of RangeTree visualization.    
+        """
         
         ret = f"[{str(self.get_location())}]"
         

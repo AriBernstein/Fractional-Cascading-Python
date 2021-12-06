@@ -17,17 +17,20 @@ class RangeTree:
     as well as construction and querying functionality.
     
     Fields:
-        _dimensionality (int): the number of dimensionality of the data set 
-            represented by this Range Tree.
+        _dimensionality (int): 
+            Dimensionality of the data set represented by this Range Tree.
+        
         _root (RangeTreeNode): the root node of the Range Tree. """
         
     
     def __init__(self, data_set:list[FullNode], dimensionality:int) -> None:
         """
         Args:
-            data_set (list[FullNode]): List of FullNode instances to be
-                preprocessed into Range Tree.
-            dimensionality (int): The Dimensionality of data_set.   """
+            data_set (list[FullNode]): 
+                List of FullNode instances to be preprocessed into Range Tree.
+            
+            dimensionality (int): 
+                The Dimensionality of data_set. """
         
         if len(data_set) == 0:
             raise Exception("data_set is empty. Cannot construct RangeTree.")
@@ -47,9 +50,8 @@ class RangeTree:
         Args:
             dimension (int): The dimension of the RangeTreeNode to return.
 
-        Returns:
-            RangeTreeNode: Highest-level RangeTreeNode at dimension in Range
-                Tree.   """
+        Returns RangeTreeNode:
+            Highest-level RangeTreeNode at dimension in Range Tree. """
                 
         if not 1 <= dimension <= self._dimensionality:
             raise InvalidDimensionalityException(dimension, self._dimensionality)
@@ -64,10 +66,11 @@ class RangeTree:
         Method to construct the Range Tree.
 
         Args:
-            cur_subset (list[list[SingleDimNode]]): Subset of the matrix of 
-                SingleDimNodes being preprocessed into a Range Tree.
-            cur_dim (int, optional): The current dimension of the RangeTreeNode
-                being constructed. 
+            cur_subset (list[list[SingleDimNode]]): 
+                Subset of SingleDimNodes matrix to preprocess into Range Tree.
+                
+            cur_dim (int, optional): 
+                The current dimension of the RangeTreeNode being constructed. 
 
         Returns:
             RangeTreeNode: The root of the RangeTree.   """
@@ -79,7 +82,7 @@ class RangeTree:
         
         # Base case - check if leaf:
         if len(cur_subset[cur_dim - 1]) == 1:
-            return RangeTreeNode(node_info=cur_subset[cur_dim - 1][0],
+            return RangeTreeNode(node_data=cur_subset[cur_dim - 1][0],
                                  next_dimension_subtree=next_dim_subtree)
             
         # Always sort
@@ -93,7 +96,7 @@ class RangeTree:
         r_subset = matrix_subset(cur_subset, m_index + 1, r_index)
                     
         this_root = RangeTreeNode(
-            node_info=l_subset[cur_dim - 1][-1],
+            node_data=l_subset[cur_dim - 1][-1],
             left_child=self._build_range_tree(l_subset, cur_dim),
             right_child=self._build_range_tree(r_subset, cur_dim),
             next_dimension_subtree=next_dim_subtree)
@@ -108,17 +111,20 @@ class RangeTree:
         Search RangeTree for a specific Node or its successor. 
         
         Args:
-            target (L): The Location value of the RangeTreeNode for which we are
-                searching.
-            cur_root (RangeTreeNode): the root of the current subtree in which 
-                we are searching.
-            path (list[tuple[int, RangeTreeNode]], optional): A list containing 
-                (int, RangeTreeNode) denoting the path taken by this search 
-                recursively through the RangeTree.
+            target (L): 
+                Location value of the RangeTreeNode for which we are searching.
+            
+            cur_root (RangeTreeNode): 
+                Root of the current subtree in which we are searching.
+                
+            path (list[tuple[int, RangeTreeNode]], optional): 
+                A list of tuples with (int, RangeTreeNode) denoting the path 
+                taken by this search recursively through the RangeTree.
                     int = 0 -> LEFT, int = 1 -> RIGHT
-            predecessor (bool): If True, and no node exists at L, return the 
-                node in the preceding location. Otherwise, return successor
-                (default).
+            
+            predecessor (bool): 
+                If True, and no node exists at L, return the node in the 
+                preceding location. Otherwise, return successor (default).
 
         Returns:
             RangeTreeNode: The RangeTreeNode at target location, or that at its 
@@ -150,19 +156,22 @@ class RangeTree:
         predecessor if the option is enabled) should none exist.
 
         Args:
-            target (L): The Location value of the RangeTreeNode for which we are
-                searching.
-            search_dimension (int): The demension in which to search for nodes 
-                at this location. Defaults to 1.
+            target (L): 
+                The Location value of the RangeTreeNode for which we are searching.
+            
+            search_dimension (int):
+                The demension in which to search for nodes at this location. 
+                Defaults to 1.
+            
             print_result (bool): If True, print search result. Default False.
-            predecessor (bool): If True, and no node exists at L, return the 
-                node in the preceding location. Otherwise, return successor
-                (default).
+            
+            predecessor (bool): 
+                If True, and no node exists at L, return the node in the 
+                preceding location. Otherwise, return successor (default).
 
-        Returns:
-            list[SingleDimNode]: A list of SingleDimNodes, each representing the
-                data's location in all dimensions including and following
-                search_dimension.   """
+        Returns list[SingleDimNode]:
+            A list of SingleDimNodes, each representing the data's location in 
+            all dimensions including and following search_dimension.    """
                 
         if not 1 <= search_dimension <= self._dimensionality:
             raise InvalidDimensionalityException(search_dimension,
@@ -196,15 +205,17 @@ class RangeTree:
         
         Args:
             cur_root (RangeTreeNode): The subtree of the current recursive call.
-            cur_dim (int): The dimension of the subtree of the current 
-                recursive call. 
-            range_mins, range_maxes (list[type[L]]): List of L (generic location 
-                objects), each representing the low and high ranges of the 
-                search for the demension correlated with each list index plus one.
+            
+            cur_dim (int): Dimension of the subtree of the current recursive call.
+            
+            range_mins, range_maxes (list[type[L]]):
+                Lists of L (generic location objects), each representing the low 
+                and high ranges of the search for the demension correlated with 
+                each list index plus one (exclusive max).
                 
-        Returns:
-            list[RangeTreeNodes]: List of RangeTreeNodes representing canonical 
-            subsets of the Range Tree.  """
+        Returns list[RangeTreeNodes]: 
+            List of RangeTreeNodes representing canonical subsets of this Range 
+            Tree containing the data between range_mins & range_maxes.  """
         
         range_min = range_mins[cur_dim - 1]
         range_max = range_maxes[cur_dim - 1] 
@@ -314,15 +325,17 @@ class RangeTree:
         Perform an orthogonal range search on this RangeTree instance.
 
         Args:
-            range_mins, range_maxes (list[type[L]]): List of L (generic location 
-                objects), each representing the low and high ranges of the 
-                search for the demension correlated with each list index plus one.
-            sort_on_data_after_query (bool, optional): If true, sort results of
-                search on their data fields. Defaults to True.
+            range_mins, range_maxes (list[type[L]]): 
+                List of L (generic location objects), each representing the low
+                and high ranges of the search for the demension correlated with 
+                each list index plus one.
+            
+            sort_on_data_after_query (bool, optional): 
+                If true (default), sort results of search on their data fields.
                 
-        Returns:
-            list[DataNode]: List of DataNode instances located between the
-                locations specified in range_mins and range_maxes.  """
+        Returns list[DataNode]: 
+            List of DataNode instances located between the locations specified 
+            in range_mins and range_maxes.  """
         
         if len(range_mins) != len(range_maxes):
             raise Exception("orthogonal_range_search method parameters " + \

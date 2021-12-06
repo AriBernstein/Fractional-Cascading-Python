@@ -15,16 +15,12 @@ class DataNode:
     
     def data(self) -> D:
         """
-        Getter for the data in this node.
-        
         Returns:
             D: Arbitrary piece of information stored in this node.  """
         return self._data
     
     def set_data(self, data) -> None:
         """
-        Setter for the data in this node.
-        
         Args:
             data (D): Arbitrary information to be stored in this node. """
         self._data = data
