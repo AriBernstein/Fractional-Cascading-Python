@@ -3,22 +3,28 @@ from typing import Union
 from GeneralNodes.FullNode import FullNode
 from GeneralNodes.LocationNode import LocationNode
 from GeneralNodes.SingleDimNode import SingleDimNode
+from Utils.TypeUtils import L
 from Utils.CustomExceptions import InvalidDimensionalityException, \
     InvalidInputException, InvalidTypeException, MissingParameterException, \
         raise_if_not_expected_types
 
-
 ################## Utils for data structures containing nodes ##################
 def fullNode_list_to_SingleDimNode_matrix(
-    data_set:list[FullNode]) -> list[list[SingleDimNode]]:
+    data_set:list[FullNode], locations_only:bool=False
+    ) -> list[list[Union[SingleDimNode, LocationNode]]]:
     """
     Given a data set represented as a list of FullNodes, convert it into a
-    matrix of SingleDimNodes.
+    matrix of either SingleDimNodes or LocationNodes.
     -> Each second-dimensional list represents a single dimension.
     -> Matrix[dimension][SingleDimNode] 
     
-    Arg data_set (list[FullNode]): 
-        K-Dimensional data set represented as a list of n FullNodes.
+    Args:
+        data_set (list[FullNode]): 
+            K-Dimensional data set represented as a list of n FullNodes.
+        
+        locations_only (bool): 
+            If true, return matrix of LocationNodes. Only relevant for
+            Fractional Cascading Matrix Demo. Defaults to false.
     
     Returns:
         list[list[SingleDimNode]]: 
@@ -30,12 +36,53 @@ def fullNode_list_to_SingleDimNode_matrix(
     
     for i, full_node in enumerate(data_set):
         for j, single_dim_node in enumerate(full_node.to_SingleDimNode_list()):
-            ret_matrix[j][i] = single_dim_node
-    
+            ret_matrix[j][i] = single_dim_node.locationNode() \
+                if locations_only else single_dim_node
+        
+    if locations_only:
+        for ret_list in ret_matrix:
+            sort_LocationNode_list(ret_list)
+                
     return ret_matrix
 
+################################ Binary Search #################################
+def search_nodes(nodes:list[LocationNode], search_val:int) -> int:
+    if len(nodes) == 0:
+        raise Exception("Cannot perform binary search on empty array.")
+    return _binary_search(nodes, 0, len(nodes) - 1, search_val)
 
-############################# Merge Sort Methods ###############################
+def _binary_search(nodes:list[LocationNode], l:int, r:int, x:int) -> LocationNode:
+    """
+    Binary search for location node list. Only useful for Fractional Cascading
+    Matrix demo.
+    
+    Args:
+        nodes (list[LocationNode]): 
+            sorted list of location nodes in which to search.
+        
+        l (int): leftmost list index in current recursive call.
+        
+        r (int): rightmost list index in current recursive call.
+        
+        x (int): value for which we are searching.
+
+    Returns LocationNode: 
+        LocationNode in nodes w/ loc value equals x if it exists, -1 otherwise.
+    """
+    if l >= r: 
+        return nodes[l] if nodes[l].loc() == x else -1
+    
+    m = l + (l - r ) // 2
+    mid_loc = nodes[m].loc()
+    
+    if x == mid_loc:
+        return nodes[m]
+    elif x < mid_loc:
+        return _binary_search(nodes, l, m, x)
+    else:
+        return _binary_search(nodes, m + 1, r, x)
+
+############################## Merge Sort Methods ##############################
 # Functions to perform an in-place merge sort on a list of SingleDimNodes. The
 # resulting state of the list is in ascending order based on the values of the
 # LocationNode in each SingleDimNode.
@@ -114,14 +161,14 @@ def _merge_lists(
         r (int): Rightmost index of the subset in this recursive call.
         
         mode (int): Correlates with one of the three types expected by arr.
-            1 -> list[SingleDimNode] or list[LocationNode]
+            1 -> list[SingleDimNode] and list[LocationNode]
             2 -> list[FullNode]]
-        
+            
         dim (int, optional):
             If not None, treat arr as list of FullNode instances to be sorted on 
             this field. Otherwise treat arr as list of SingleDimNodes.  """
-    
-    if mode != 1 and dim == None:
+
+    if mode == 2 and dim is None:
         raise MissingParameterException(
             "_merge_lists", "dim", "Dimensionality parameter can only be " + \
                 "left None if parameter mode == 1 (meaning that arr is a " + \
@@ -173,8 +220,9 @@ def _merge_lists(
         j += 1
     
 
-def _merge_sort(arr:Union[list[SingleDimNode], list[FullNode], list[list[SingleDimNode]]],
-                l:int, r:int, mode:int=None, dim:int=None, on_data:bool=False) -> None:
+def _merge_sort(arr:list[
+    Union[SingleDimNode, FullNode, list[SingleDimNode], LocationNode]],
+    l:int, r:int, mode:int=None, dim:int=None, on_data:bool=False) -> None:
     """
     In-place recursive merge sort.
     
@@ -192,6 +240,7 @@ def _merge_sort(arr:Union[list[SingleDimNode], list[FullNode], list[list[SingleD
             1 -> list[SingleDimNode]
             2 -> list[FullNode]
             3 -> list[list[SingleDimNode]]
+            4 -> list[LocationNode]
         
         dim (int, optional):
             If not None, treat arr as list of FullNode instances to be sorted on 
@@ -219,6 +268,12 @@ def _merge_sort(arr:Union[list[SingleDimNode], list[FullNode], list[list[SingleD
             _merge_lists(arr, l, m, r, mode, dim, on_data)
         else:
             _merge_matrices(arr, l, m, r, dim)
+            
+
+def sort_LocationNode_list(unsorted_arr:list[LocationNode]) -> None:
+    if len(unsorted_arr) > 1:
+        _merge_sort(unsorted_arr, 0, len(unsorted_arr) - 1, 1)
+      
             
 def sort_SingleDimNode_list(unsorted_arr:list[SingleDimNode], on_data:bool=False) -> None:
     """
