@@ -45,10 +45,7 @@ class RangeTreeNode:
         return self._next_dim_subtree
     
     def dimension(self) -> int:
-        """
-        Returns:
-            int: The dimension of the location of this RangeTreeNode.   """
-            
+        """Returns: the dimension of the location of this RangeTreeNode.  """
         return self._single_dim_node.dim()
     
     def left_child(self) -> 'RangeTreeNode':        

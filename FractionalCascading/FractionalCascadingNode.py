@@ -68,13 +68,24 @@ class FractionalCascadingNode:
             f"promoted from dim {self.initial_dim()}."
     
     def __eq__(self, __o: object) -> bool:
-        if isinstance(__o, FractionalCascadingNode):
-            return self.current_dim == __o.current_dim and \
-                self.location() == __o.location()
-        return False
-    
+        return self.current_dim == __o.current_dim and \
+            self.location().loc() == __o.location().loc() \
+                if isinstance(__o, FractionalCascadingNode) else False
+
     def __lt__(self, __o: object) -> bool:
-        if isinstance(__o, FractionalCascadingNode):
-            return self.current_dim == __o.current_dim and \
-                self.location() < __o.location()
-        return False
+        return self.current_dim == __o.current_dim and \
+            self.location().loc() < __o.location().loc() \
+                if isinstance(__o, FractionalCascadingNode) else False
+    
+    def __gt__(self, __o: object) -> bool:
+        return self.current_dim == __o.current_dim and \
+            self.location().loc() > __o.location().loc() \
+                if isinstance(__o, FractionalCascadingNode) else False
+                
+    def __le__(self, __o: object) -> bool:
+        return self.current_dim == __o.current_dim and not self > __o \
+            if isinstance(__o, FractionalCascadingNode) else False
+            
+    def __ge__(self, __o: object) -> bool:
+        return self.current_dim == __o.current_dim and not self < __o \
+            if isinstance(__o, FractionalCascadingNode) else False

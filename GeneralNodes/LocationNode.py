@@ -68,26 +68,25 @@ class LocationNode:
     # Comparison method overrides are all in context of _loc field.
     def __eq__(self, __o: object) -> bool:
         if isinstance(__o, LocationNode):
-            return self._loc == __o.loc()
-            
+            return self._loc == __o.loc() and self._dim == __o.dim()
         return False
     
     def __gt__(self, __o: object) -> bool:
         if isinstance(__o, LocationNode):
-            return self._loc > __o.loc()
+            return self._loc > __o.loc() and self._dim == __o.dim()
         return False
     
     def __lt__(self, __o: object) -> bool:
         if isinstance(__o, LocationNode):
-            return self._loc < __o.loc()
+            return self._loc < __o.loc() and self._dim == __o.dim()
         return False
     
     def __ge__(self, __o: object) -> bool:
         if isinstance(__o, LocationNode):
-            return not self.__lt__(__o)
+            return not self.__lt__(__o) and self._dim == __o.dim()
         return False
     
     def __le__(self, __o: object) -> bool:
         if isinstance(__o, LocationNode):
-            return not self.__gt__(__o)
+            return not self.__gt__(__o) and self._dim == __o.dim()
         return False
