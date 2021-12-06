@@ -1,5 +1,6 @@
 from GeneralNodes.LocationNode import LocationNode
 from GeneralNodes.SingleDimNode import SingleDimNode
+from Utils.GeneralUtils import pretty_list
 
 class FCNode:
     
@@ -60,22 +61,31 @@ class FCNode:
         
         self._l_promotional_neighbor = None
         self._r_promotional_neighbor = None
-        
+    
+    def prev_node(self) -> 'FCNode':
+        return self._l_list_neighbor
+    
+    def set_prev_node(self, new_prev:'FCNode') -> None:
+        self._l_list_neighbor = new_prev
+    
+    def next_node(self) -> 'FCNode':
+        return self._r_list_neighbor
+    
+    def set_next_node(self, new_next:'FCNode') -> None:
+        self._r_list_neighbor = new_next
+    
     def copy(self) -> 'FCNode':
         return FCNode(
             base_node=self._base_node, dimension=self._cur_dim,
             left_list_neighbor=self._l_list_neighbor,
             right_list_neighbor=self._r_list_neighbor, 
-            higher_dim_variant=self._higher_dim_variant
-        )
+            higher_dim_variant=self._higher_dim_variant)
         
     def promote(self) -> 'FCNode':
         return FCNode(
             base_node=self._base_node,
             dimension=self._cur_dim + 1, 
-            higher_dim_variant=self
-        )
-        
+            higher_dim_variant=self)
     
     def local(self) -> bool:
         return self.initial_dim() == self._cur_dim
@@ -130,3 +140,70 @@ class FCNode:
     def __ge__(self, __o: object) -> bool:
         return self.current_dim == __o.current_dim and not self < __o \
             if isinstance(__o, FCNode) else False
+            
+            
+class FCNodeList:
+    
+    """
+    Class to wrap linked list of FCNodes.
+    """
+    
+    def __init__(self, list_head:FCNode=None, list_tail:FCNode=None, list_size:int=0) -> None:
+        self._list_head = list_head
+        self._list_tail = list_tail
+        self._n = list_size
+    
+    def head(self) -> FCNode:
+        return self._list_head
+    
+    def tail(self) -> FCNode:
+        return self._list_tail
+    
+    def to_list(self) -> list[FCNode]:
+        """
+        Returns list[FCNode]:
+            FCNode linked list converted into regular ordered list of the same
+            type of nodes.  """
+        
+        fc_node_list = []
+        cur_link = self._list_head
+        
+        while cur_link is not None:
+            fc_node_list.append(cur_link)
+            cur_link = cur_link.next_node()
+        
+        return fc_node_list
+    
+    
+    def append(self, fc_node:FCNode) -> None:
+        """
+        Append fc_node to the (right) end of the linked list. Update the tail.
+        
+        Args fc_node (FCNode): Node to append.  """
+        if self._n == 0:
+            self._list_head = self._list_tail = fc_node
+        else:            
+            self._list_tail.set_next_node(fc_node)
+            fc_node.set_prev_node(self._list_tail)
+            self._list_tail = fc_node
+        
+        self._n += 1
+    
+    def append_left(self, fc_node:FCNode) -> None:
+        """
+        Append fc_node to the left end of the linked list. Update the head.
+        
+        Args fc_node (FCNode): Node to append.  """
+        if self._n == 0:
+            self._list_head = self._list_tail = fc_node
+        else:
+            self._list_head.set_prev_node(fc_node)
+            fc_node.set_next_node(self._list_head)
+            self._list_head = fc_node
+        self._n += 1
+    
+    def __len__(self) -> int:
+        return self._n
+    
+    def __str__(self) -> str:
+        return pretty_list(self.to_list())
