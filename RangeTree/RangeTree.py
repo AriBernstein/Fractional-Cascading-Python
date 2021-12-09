@@ -39,6 +39,9 @@ class RangeTree:
         self._dimensionality = dimensionality
         self._root = self._build_range_tree(
             fullNode_list_to_SingleDimNode_matrix(data_set))
+        
+        # TODO: get rid of this - figure out why it's necessary
+        self._assign_all_parents()
     
         
     def root(self):
@@ -361,3 +364,27 @@ class RangeTree:
             sort_SingleDimNode_list(nodes_in_search_range, True)
         
         return [sd_node.dataNode() for sd_node in nodes_in_search_range]
+    
+    
+    def _assign_all_parents(self, cur_root:RangeTreeNode=None) -> None:
+        """
+        TODO:  This method should not be necessary.
+        All parents should be assigned as the tree is created.
+        """
+        cur_root = self._root if cur_root is None else cur_root
+        
+        if cur_root.left_child() is not None:
+            cur_root.left_child().set_parent(cur_root)
+            self._assign_all_parents(cur_root.left_child())
+            
+        if cur_root.right_child() is not None:
+            cur_root.right_child().set_parent(cur_root)
+            self._assign_all_parents(cur_root.right_child())
+        
+    
+    
+########################### Red Black Tree Experiment ##########################
+    def make_red_black_tree(self) -> None:
+        self._root.color_children()
+    
+    
