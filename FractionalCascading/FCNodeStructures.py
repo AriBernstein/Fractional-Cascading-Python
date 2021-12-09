@@ -1,6 +1,7 @@
 from GeneralNodes.LocationNode import LocationNode
-from GeneralNodes.SingleDimNode import SingleDimNode
+from Utils.CustomExceptions import InvalidInputException
 from Utils.GeneralUtils import pretty_list
+from Utils.TypeUtils import L
 
 class FCNode:
     
@@ -16,13 +17,16 @@ class FCNode:
             If x was initially of dimension k st it does not exist in any higher
             dimensions, it is considered "Local". (Opposite of promoted.)
             
+        Foreign:
+            Of a different original dimension dimension.
+            
         Left, Right:
             Nodes to the left & right of x share a current dimension value and 
             have locations in the current dimension less-than/equal-to and
             greater-than that of x, respectively.
             
     Fields:
-        _base_node (SingleDimNode):
+        _base_node (LocationNode):
             Contains location & data of initial node.
         
         _cur_dim (int): 
@@ -39,15 +43,19 @@ class FCNode:
             Pointer to current node's left (lower) neighbor and right (higher) 
             neighbor respectively in the linked list.
             
-        _l_fc_neighbor, (FCNode), _r_fc_neighbor (FCNode):
+        _l_f_neighbor, (FCNode), _r_f_neighbor (FCNode):
+            l_f_n... -> left_foreign_neighbor, r_f_n...-> right_forign_neighbor.
             Nodes in fractional cascading data structures store pointers to the 
             nearest preceding and proceeding nodes in the current dimension with 
             opposite promotional statuses to the current.   """
  
-    def __init__(self, base_node:SingleDimNode, dimension:int=None,
+    def __init__(self, base_node:LocationNode, dimension:int=None,
                  left_list_neighbor:'FCNode'=None,
                  right_list_neighbor:'FCNode'=None,
                  higher_dim_variant:'FCNode'=None) -> None:
+        if dimension is not None and dimension <= 0:
+            raise InvalidInputException(
+                "dimension", str(dimension), "greater than 1", "FCNode")
         
         self._base_node = base_node
         self._cur_dim = dimension if dimension is not None else base_node.dim()
@@ -57,34 +65,64 @@ class FCNode:
         self._l_list_neighbor = left_list_neighbor
         self._r_list_neighbor = right_list_neighbor
         
-        self._l_fc_neighbor = None
-        self._r_fc_neighbor = None
+        self._l_f_neighbor = None
+        self._r_f_neighbor = None
+    
+    def dim(self) -> int:
+        """
+        Returns: int: Current dimension of this FCNode. """
+        return self._cur_dim
+    
+    def base_dim(self) -> int:
+        """
+        Returns: int: Initial dimension of the LocationNode of this FCNode. """
+        return self._base_node.dim()
+    
+    def loc(self) -> L:
+        """
+        Returns: L: The location in the LocationNode in this FCNode.    """
+        return self._base_node.loc()
     
     def prev_list_neighbor(self) -> 'FCNode':
+        """
+        Returns: FCNode: the previous (or left) linked list element. (Assigned 
+        during node promotion.)  """
         return self._l_list_neighbor
     
     def set_prev_neighbor(self, new_prev:'FCNode') -> None:
         self._l_list_neighbor = new_prev
     
     def next_list_neighbor(self) -> 'FCNode':
+        """
+        Returns: FCNode: the next (or right) linked list element. (Assigned 
+        during node promotion.)  """
         return self._r_list_neighbor
     
     def set_next_list_neighbor(self, new_next:'FCNode') -> None:
         self._r_list_neighbor = new_next
         
-    def prev_fc_neighbor(self) -> 'FCNode':
-        return self._l_fc_neighbor
+    def prev_foreign_neighbor(self) -> 'FCNode':
+        """
+        Returns: FCNode: the prev (or left) foreign linked list element (not
+        from the original dimension stored in _base_node. of this instance. """
+        return self._l_f_neighbor
     
-    def set_prev_fc_neighbor(self, left_fc_neighbor:'FCNode') -> None:
-        self._l_fc_neighbor = left_fc_neighbor
+    def set_prev_f_neighbor(self, left_foreign_neighbor:'FCNode') -> None:
+        self._l_f_neighbor = left_foreign_neighbor
                 
-    def next_fc_neighbor(self) -> 'FCNode':
-        return self._r_fc_neighbor
+    def next_foreign_neighbor(self) -> 'FCNode':
+        """
+        Returns: FCNode: the next (or right) foreign linked list element (not
+        from the original dimension stored in _base_node. of this instance. """
+        return self._r_f_neighbor
     
-    def set_next_fc_neighbor(self, right_fc_neighbor:'FCNode') -> None:
-        self._r_fc_neighbor = right_fc_neighbor
+    def set_next_f_neighbor(self, right_fc_neighbor:'FCNode') -> None:
+        self._r_f_neighbor = right_fc_neighbor
     
     def copy(self) -> 'FCNode':
+        """
+        Returns: FCNode: 
+            New FCNode instance with the exact same field values as this.   """
         return FCNode(
             base_node=self._base_node, dimension=self._cur_dim,
             left_list_neighbor=self._l_list_neighbor,
@@ -92,6 +130,11 @@ class FCNode:
             higher_dim_variant=self._higher_dim_variant)
         
     def promote(self) -> 'FCNode':
+        """
+        Returns: FCNode: 
+            New FCNode instance with same _base_node, decremented current dim, 
+            and no pointers to other list elements. The _higher_dim_variant of
+            this new instance is the current instance (self).   """
         return FCNode(
             base_node=self._base_node,
             dimension=self._cur_dim - 1, 
@@ -100,14 +143,20 @@ class FCNode:
     def is_local(self) -> bool:
         return self.initial_dim() == self._cur_dim
     
-    def is_promoted(self) -> bool: 
+    def is_promoted(self) -> bool:
         return not self.is_local()
     
-    def base_node(self) -> SingleDimNode:
+    def base_node(self) -> LocationNode:
         return self._base_node
     
     def current_dim(self) -> int:
         return self._cur_dim
+    
+    def prev_dim_variant(self) -> 'FCNode':
+        """
+        Returns: FCNode: The FCNode representing the current in a higher 
+        (previous) dimension.   """
+        return self._higher_dim_variant
     
     def prev_dim(self) -> int:
         return self._higher_dim_variant.current_dim()
@@ -115,63 +164,76 @@ class FCNode:
     def initial_dim(self) -> int:
         return self._base_node.dim()
     
-    def set_higher_dim_fc_node(self, hd_node:'FCNode') -> None:
-        self._higher_dim_variant = hd_node
-        
-    def location(self) -> LocationNode:
-        return self._base_node.locationNode()
+    def set_higher_dim_fc_node(self, h_d_node:'FCNode') -> None:
+        self._higher_dim_variant = h_d_node
         
     def __hash__(self) -> int:
         return hash(self._base_node)
     
     def __str__(self) -> str:
-        return f"Dim: {self._cur_dim}, Loc: {self._base_node.loc()}, " + \
-            f"promoted from dim {self.initial_dim()}."
+        cur_dim_label = self._cur_dim
+        if self._cur_dim <= 3 and self.base_node()._dim_label is not None:
+            cur_dim_label = 'x' if self._cur_dim == 1 else 'y' \
+                if self._cur_dim == 2 else 'z'
+        
+        return f"(Cur Dim: {cur_dim_label}, Base {self.base_node()})"
     
+    def __repr__(self) -> str:
+        return str(self)
+    
+    # NOTE: These do not consider dimensionality of the base_node and may as 
+    #       such equate two items as equal when the base nodes contain the same
+    #       value but are of different dimensions.
     def __eq__(self, __o: object) -> bool:
-        return self.current_dim == __o.current_dim and \
-            self.location().loc() == __o.location().loc() \
+        return self.current_dim() == __o.current_dim() and \
+            self._base_node.loc() == __o.base_node().loc() \
                 if isinstance(__o, FCNode) else False
     
     def __lt__(self, __o: object) -> bool:
-        return self.current_dim == __o.current_dim and \
-            self.location().loc() < __o.location().loc() \
+        return self.current_dim() == __o.current_dim() and \
+            self._base_node.loc() < __o.base_node().loc() \
                 if isinstance(__o, FCNode) else False
                 
     def __gt__(self, __o: object) -> bool:
-        return self.current_dim == __o.current_dim and \
-            self.location().loc() > __o.location().loc() \
+        return self.current_dim() == __o.current_dim() and \
+            self._base_node.loc() > __o.base_node().loc() \
                 if isinstance(__o, FCNode) else False
                 
     def __le__(self, __o: object) -> bool:
-        return self.current_dim == __o.current_dim and not self > __o \
+        return self.current_dim() == __o.current_dim() and not self > __o \
             if isinstance(__o, FCNode) else False
             
     def __ge__(self, __o: object) -> bool:
-        return self.current_dim == __o.current_dim and not self < __o \
+        return self.current_dim() == __o.current_dim() and not self < __o \
             if isinstance(__o, FCNode) else False
             
-            
-class FCNodeList:
+
+class FCList:
     
     """
     Class to wrap linked list of FCNodes.
     """
     
-    def __init__(self, list_head:FCNode=None, list_tail:FCNode=None, list_size:int=0) -> None:
-        self._list_head = list_head
-        self._list_tail = list_tail
-        self._n = list_size
+    def __init__(self) -> None:
+        self._list_head = None
+        self._list_tail = None
+        self._n = 0
     
     def head(self) -> FCNode:
+        """
+        Returns: FCNode: The FCNode at the head of the linked list of nodes.
+        """
         return self._list_head
     
     def tail(self) -> FCNode:
+        """
+        Returns: FCNode: The FCNode at the tail of the linked list of nodes.
+        """
         return self._list_tail
     
     def to_list(self) -> list[FCNode]:
         """
-        Returns list[FCNode]:
+        Returns: list[FCNode]:
             FCNode linked list converted into regular ordered list of the same
             type of nodes.  """
         
@@ -183,7 +245,6 @@ class FCNodeList:
             cur_link = cur_link.next_list_neighbor()
         
         return fc_node_list
-    
     
     def append(self, fc_node:FCNode) -> None:
         """
@@ -211,10 +272,15 @@ class FCNodeList:
             self._list_head = fc_node
         self._n += 1
         
-        
-    def get_promoted_subset(self) -> 'FCNodeList':
+    def get_promoted_subset(self) -> 'FCList':
+        """
+        Returns: FCList: 
+            FCList containing every second element of this one, relative
+            ordering maintained.    """
         add_node = True
-        subset, subset_pointer = FCNodeList(), self._list_head
+        subset = FCList()
+        subset_pointer = self._list_head
+        
         while(subset_pointer is not None):
             if add_node:
                 subset.append(subset_pointer.promote())
@@ -223,11 +289,11 @@ class FCNodeList:
                 add_node = True
                 
             subset_pointer = subset_pointer.next_list_neighbor()
+        
         return subset
-        
-        
-    def copy(self) -> 'FCNodeList':
-        cp, cp_pointer = FCNodeList(), self._list_head        
+    
+    def copy(self) -> 'FCList':
+        cp, cp_pointer = FCList(), self._list_head        
         while cp_pointer is not None:
             cp.append(cp_pointer.copy())
             cp_pointer = cp_pointer.next_list_neighbor()
@@ -238,3 +304,6 @@ class FCNodeList:
     
     def __str__(self) -> str:
         return pretty_list(self.to_list())
+    
+    def __repr__(self) -> str:
+        return str(self)

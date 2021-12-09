@@ -1,6 +1,8 @@
 
 from typing import Type
 
+from Utils.TypeUtils import L
+
 class MissingComparisonMethodsException(Exception):
     def __init__(self, missing_methods:list[str]) -> None:
         super().__init__("In order to use this object when creating a node," + \
@@ -42,9 +44,20 @@ class InvalidTypeException(Exception):
         
 class InvalidInputException(Exception):
     def __init__(self, field_name:str, given_val:str, expected_val:str, owner:str) -> None:
-        super().__init__(f"Object or method {owner} expected {field_name}" + \
-            f" to be {expected_val} when {given_val} was given.")
+        super().__init__(f"Object or method {owner} expected {field_name} " + \
+            f"parameter to be {expected_val} when {given_val} was given.")
         
+class NodeNotFoundInCorrectDimension(Exception):
+    def __init__(self) -> None:
+        super().__init__("Node of correct dimension not found in the " + \
+                         "augmented list representing the first dimension.")
+
+class NoChildrenException(Exception):
+    def __init__(self) -> None:
+        super().__init__("This object should always have children, even if " + \
+            "it is a leaf. Make sure that you did not forget to assign them" + \
+                "using the assign_rt_children(... method.")
+     
         
 def raise_if_equal(obj_a:object, obj_b:object, invert:bool=False,
                    exception:Type[Exception]=None, params:list=None,

@@ -1,4 +1,5 @@
 from typing import Union
+from FractionalCascading.FCNodeStructures import FCNode
 
 from GeneralNodes.FullNode import FullNode
 from GeneralNodes.LocationNode import LocationNode
@@ -46,39 +47,44 @@ def fullNode_list_to_SingleDimNode_matrix(
     return ret_matrix
 
 ################################ Binary Search #################################
-def search_nodes(nodes:list[LocationNode], search_val:int) -> int:
+def search_nodes(nodes:list[Union[LocationNode, FCNode]], 
+                 search_val:L) -> tuple[Union[LocationNode, FCNode], int]:
     if len(nodes) == 0:
         raise Exception("Cannot perform binary search on empty array.")
     return _binary_search(nodes, 0, len(nodes) - 1, search_val)
 
-def _binary_search(nodes:list[LocationNode], l:int, r:int, x:int) -> LocationNode:
+def _binary_search(nodes:list[Union[LocationNode, FCNode]],
+                   l:int, r:int, x:L) -> tuple[Union[LocationNode, FCNode], int]:
     """
-    Binary search for location node list. Only useful for Fractional Cascading
-    Matrix demo.
+    Binary search for location node in list. Only useful for Fractional 
+    Cascading Matrix demo.
     
     Args:
-        nodes (list[LocationNode]): 
-            sorted list of location nodes in which to search.
+        nodes (list[Union[LocationNode, FCNode]]): 
+            sorted list of location nodes or FCNodes in which to search.
         
         l (int): leftmost list index in current recursive call.
         
         r (int): rightmost list index in current recursive call.
         
-        x (int): value for which we are searching.
+        x (L): locaton type value for which we are searching.
 
-    Returns LocationNode: 
+    Returns: tuple[LocationNode, int]: 
         LocationNode in nodes w/ loc value equals x if it exists, -1 otherwise.
-    """
-    if l >= r: 
-        return nodes[l] if nodes[l].loc() == x else -1
+        int is the index of the location node in nodes. 
+        
+        Or (None, None) should the value not exist in the list. """
     
-    m = l + (l - r ) // 2
-    mid_loc = nodes[m].loc()
+    if r < l: return (None, None)
+
+    m = l + (r - l) // 2
     
-    if x == mid_loc:
-        return nodes[m]
-    elif x < mid_loc:
-        return _binary_search(nodes, l, m, x)
+    if nodes[m].loc() == x:
+        return (nodes[m], m)
+    
+    elif nodes[m].loc() > x:
+        return _binary_search(nodes, l, m-1, x)
+
     else:
         return _binary_search(nodes, m + 1, r, x)
 

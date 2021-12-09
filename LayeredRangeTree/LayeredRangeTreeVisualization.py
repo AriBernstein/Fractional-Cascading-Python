@@ -1,7 +1,8 @@
 from typing import Union
-from RangeTree.RangeTree import RangeTree
 from Utils.GeneralUtils import StringContainer
-from RangeTree.RangeTreeNode import RangeTreeNode
+from LayeredRangeTree.LayeredRangeTree import LayeredRangeTree
+from LayeredRangeTree.LayeredRangeTreeNode import RangeTreeNode, \
+    LayeredRangeTreeNode, LayeredRangeTreeSubNode
 
 """
 Methods which create a text visualization of the Range Tree. Outside-facing 
@@ -96,9 +97,9 @@ def _traverse_pre_order(cur_root:RangeTreeNode) -> str:
     return str(visualize_str)
     
 
-def visualize_range_tree(root:Union[RangeTreeNode, RangeTree],
-                         vertical_spacing:int=2, indent_per_level:int=7, 
-                         safe_chars:bool=False, print_tree=False) -> str:
+def visualize_layered_range_tree(
+    root:Union[RangeTreeNode, LayeredRangeTree], vertical_spacing:int=2, 
+    indent_per_level:int=7, safe_chars:bool=False, print_tree=False) -> str:
     """
     Initialize globals and traverse range tree to generate visualization string.
 
@@ -141,7 +142,7 @@ def visualize_range_tree(root:Union[RangeTreeNode, RangeTree],
     _TWO_CHILDREN_INDENT = _v_line_char() + _PADDING_CHARS
     _WHITE_SPACE_INDENT = ' ' + _PADDING_CHARS
     
-    root = root.root() if isinstance(root, RangeTree) else root
+    root = root.root() if isinstance(root, LayeredRangeTree) else root
     ret_str = _traverse_pre_order(root)
     
     if print_tree:

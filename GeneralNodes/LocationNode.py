@@ -1,4 +1,5 @@
 from typing import Optional
+from Utils.CustomExceptions import InvalidInputException
 
 from Utils.TypeUtils import L
 
@@ -33,6 +34,10 @@ class LocationNode:
             dimension_label (Optional[str], optional): 
                 String further representing the dimension for cases in which it 
                 is indicative of something other than a number. """
+                
+        if dimension < 1:
+            raise InvalidInputException(
+                "dimension", str(dimension), "greater than 0", "LocationNode")
         
         # check_for_comparison_meths(location)  # Raise exception if can't compare
         self._loc = location
@@ -41,7 +46,7 @@ class LocationNode:
     
     def loc(self) -> L:
         """
-        Returns L: The location value of this LocationNode. """
+        Returns: L: The location value of this LocationNode. """
         return self._loc
     
     def set_loc(self, loc:L) -> None:
@@ -52,26 +57,26 @@ class LocationNode:
         
     def dim(self) -> int:
         """
-        Returns int: Integer representing the dimension in which the location in
+        Returns: int: Integer representing the dimension in which the location in
             this LocationNode refers.   """
         return self._dim
     
     def dim_str(self) -> str:
         """
-        Returns str: _dim_label if the field exists, else the dimension integer
+        Returns: str: _dim_label if the field exists, else the dimension integer
             of the current node as a string.   """
         return self._dim_label if self._dim_label else str(self._dim)
     
     def visualizer_str(self) -> str:
         """
-        Returns str: representation of LocationNode used for visualization. """
+        Returns: str: representation of LocationNode used for visualization. """
         return f"{self.dim_str()}: {self._loc}"
     
     def __str__(self) -> str:
         return f"Dim: {self.dim_str()}, Loc: {self._loc}"
         
     def __repr__(self) -> str:
-        return str(self)
+        return f"({str(self)})"
     
     # Comparison method overrides are all in context of _loc field.
     def __eq__(self, __o: object) -> bool:
@@ -98,3 +103,5 @@ class LocationNode:
         if isinstance(__o, LocationNode):
             return not self.__gt__(__o) and self._dim == __o.dim()
         return False
+    
+    def locationNode(self) -> 'LocationNode': return self

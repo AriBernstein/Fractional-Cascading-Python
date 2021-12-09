@@ -36,20 +36,20 @@ class FullNode:
         
     def data(self) -> D:
         """
-        Returns D:
+        Returns: D:
             Arbitrary data stored in the DataNode stored this FullNode instance.
         """
         return self._data.data()
     
     def dataNode(self) -> DataNode:
         """
-        Returns DataNode:   
+        Returns: DataNode:   
             The DataNode stored in this FullNode instance.  """
         return self._data
     
     def locations(self) -> dict[int, LocationNode]:
         """
-        Returns dict[int, LocationNode]: 
+        : dict[int, LocationNode]: 
             Dictionary representing the locations of this FullNode instance in
             each dimension. """
         return self._locs
@@ -61,7 +61,7 @@ class FullNode:
         Raises InvalidDimensionalityException:
             When d value is invalid for this FullNode instance.
 
-        Returns LocationNode:   
+        Returns: LocationNode:   
             The LocationNode associated with the dth dimension. """
         
         if not 1 <= d <= self.dimensionality():
@@ -70,7 +70,7 @@ class FullNode:
     
     def dimensionality(self) -> int:
         """
-        Returns int: 
+        Returns: int: 
             Number of dimensions in which this FullNode instance is located.    
         """
         return len(self._locs)
@@ -79,7 +79,7 @@ class FullNode:
         """
         Args d (int): The single dimension of the returned SingleDimNode.
         
-        Returns SingleDimNode:
+        Returns: SingleDimNode:
             SingleDimNode representing the data from this FullNode instance as
             well as its location in the dth dimension.  """
         
@@ -90,7 +90,7 @@ class FullNode:
         Convert data stored in this FullNode object into a list of 
         SingleDimNodes.
 
-        Returns list[SingleDimNode]: 
+        Returns: list[SingleDimNode]: 
             A list of n SingleDimNodes, one for each LocationNode in self._locs.
         """
                 

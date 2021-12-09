@@ -1,10 +1,10 @@
-from enum import Enum
 from typing import Union
 
 from GeneralNodes.DataNode import DataNode
 from GeneralNodes.FullNode import FullNode
 from GeneralNodes.LocationNode import LocationNode
 from GeneralNodes.SingleDimNode import SingleDimNode
+from Utils.CustomExceptions import NoChildrenException
 from Utils.GeneralUtils import pretty_list
 from Utils.TypeUtils import D, L
 
@@ -219,90 +219,59 @@ class RangeTreeNode:
         if isinstance(__o, RangeTreeNode):
             return not self > __o.get_locationNode()
         return False
-    
-    ######################## Red-black tree experiments ########################
-    class rb_color(Enum):
-        red = 1
-        black = 0
-        
-        def __str__(self) -> str:
-            return "red" if self.value else "black"
-        
-        def __repr__(self) -> str:
-            return str(self)
-        
-    _color = None
-    _black_node_quota = None
-    
-    def is_red(self) -> bool: return self._color == self.rb_color.red
-    def is_black(self) -> bool: self._color == self.rb_color.black
-        
-    def color_node(self) -> None:
-        
-        if self.is_root():
-            self._color = self.rb_color.black
-            self._black_node_quota = -(-self._get_height(self) // 2) # Round up
-        
-        elif self.parent().is_red():
-            self._color = self.rb_color.black
-            self._black_node_quota = self.parent()._black_node_quota
-        
-        else:
-            min_h = self._get_height(self, max_h=False)
-            
-            if min_h < self.parent()._black_node_quota:
-                raise Exception("Tree is too imbalanced for Red Black form.")
 
-            elif min_h == self.parent()._black_node_quota:
-                self._color = self.rb_color.black
-            
-            else:   # min_h < parent black node quota
-                self._color = self.rb_color.red
-                
-            self._black_node_quota = self.parent()._black_node_quota - 1
-            
-    def color_children(self, cur_node=None) -> None:
-        if cur_node is None:
-            cur_node = self
+class LayeredRangeTreeSubNode:
+    
+    def __init__(self, node_data:SingleDimNode, 
+                 full_lrt_node:'LayeredRangeTreeNode') -> None:
+        self._node_data = node_data
+        self._layered_range_tree_node = full_lrt_node
+        self._left_child = None      # type: 'LayeredRangeTreeSubNode'
+        self._right_child = None     # type: 'LayeredRangeTreeSubNode'
         
-        self.color_node()
+    def get_SingleDimNode(self) -> SingleDimNode:
+        return self._node_data
+    
+    def get_LayeredRangeTreeNode(self) -> 'LayeredRangeTreeNode':
+        return self._layered_range_tree_node
+    
+    def loc(self) -> L:
+        return self._node_data.loc()
+    
+    def dim(self) -> int:
+        return self._node_data.dim()
+    
+    def left_child(self) -> 'LayeredRangeTreeSubNode':
+        return self._left_child
+    
+    def set_left_child(self, left_child:'LayeredRangeTreeSubNode') -> None:
+        self._left_child = left_child
         
-        if self.left_child() is not None:
-            self.color_children(self.left_child)
+    def right_child(self) -> 'LayeredRangeTreeSubNode':
+        return self._right_child
+    
+    def set_right_child(self, right_child:'LayeredRangeTreeSubNode') -> None:
+        self._right_child = right_child
+    
+    def __str__(self) -> str:
+        return f"(Loc: {self.loc()}, L: {self._left_child.loc()}, " + \
+            f"R: {self._right_child.loc()})"
+    
+    def __repr__(self) -> str:
+        return self.loc()
+    
+    
+class LayeredRangeTreeNode:
+    
+    def __init__(self) -> None:
+        self._children = None
         
-        if self.right_child is not None:
-            self.color_children(self.right_child())
-            
-            
-    def _get_height(self, cur_root:'RangeTreeNode', cur_h:int=0, max_h:bool=True) -> int:
-        """
-        Return the height of the tree rooted at cur_node.
-
-        Args:
-            cur_root (RangeTreeNode): The subtree in the current recursive step.
-           
-            cur_h (int, optional): Height of our tree thus far.
-           
-            max_h (bool, optional):
-                If true (default), find distance from cur_root to "deepest"
-                leaf, else distance to "shallowest" leaf.
-                
-        Returns: int: height of tree.   """
-        
-        if cur_root.is_leaf():
-            return cur_h + 1
-        
-        l_height, r_height = None, None
-        
-        if self.left_child():
-            l_height = self._get_height(cur_root.left_child(), cur_h + 1, max_h)
-        if self.right_child():
-            r_height = self._get_height(cur_root.right_child(), cur_h + 1, max_h)
-        
-        if l_height is not None and r_height is not None:
-            return max(l_height, r_height) if max_h else min(l_height, r_height)
-        
-        elif l_height is not None:
-            return l_height
-        else:
-            return r_height  
+    def get_children(self):
+        if not self._children:
+            raise NoChildrenException()
+        return self._children
+    
+    def __str__(self) -> str:
+        if not self._children:
+            raise NoChildrenException()
+        return pretty_list(self._children)

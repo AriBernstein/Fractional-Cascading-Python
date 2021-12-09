@@ -5,7 +5,8 @@ from Utils.CustomExceptions import InvalidInputException, InvalidTypeException
 class StringContainer:
     
     """
-    Class to contain a string to be passed as a reference and mutated over 
+    Class to contain a string to be passed as a reference and mutated within 
+     
     method calls.   """
     
     def __init__(self, initial_str:str="") -> None:
@@ -139,7 +140,7 @@ def pad_ints(i:int, n:int) -> str:
 
     Raises Exception: If i has more digits than n.
 
-    Returns str: String containing integer i, front-padded to n characters. """
+    Returns: str: String containing integer i, front-padded to n characters. """
     
     i_str = str(i)
     i_len = len(i_str)
