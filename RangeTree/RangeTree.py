@@ -122,6 +122,9 @@ class RangeTree:
             sort_on_data_after_query (bool, optional): 
                 If true (default), sort results of search on their data fields.
                 
+        Raises: Exceptions: 
+            Ensure range_mins & range_maxes contains bounds for each dimension.
+                
         Returns: list[DataNode]: 
             List of DataNode instances located between the locations specified 
             in range_mins and range_maxes.  """

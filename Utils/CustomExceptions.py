@@ -48,9 +48,10 @@ class InvalidInputException(Exception):
             f"parameter to be {expected_val} when {given_val} was given.")
         
 class NodeNotFoundInCorrectDimension(Exception):
-    def __init__(self) -> None:
-        super().__init__("Node of correct dimension not found in the " + \
-                         "augmented list representing the first dimension.")
+    def __init__(self, expected_dim:int) -> None:
+        super().__init__(
+            "Node of correct dimension not found in the augmented list " + \
+                f"representing dimension {expected_dim}.")
 
 class NoChildrenException(Exception):
     def __init__(self) -> None:

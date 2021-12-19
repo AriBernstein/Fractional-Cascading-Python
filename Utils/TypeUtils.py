@@ -60,7 +60,3 @@ L = TypeVar('L')
 
 # if __name__ == "__main__":
 #     c = check_existing_methods(B(), ["__eq__", "__ne__", "__lt__"])
-#     if c:
-#         print("DOPE")
-#     else:
-#         print("NOPE")

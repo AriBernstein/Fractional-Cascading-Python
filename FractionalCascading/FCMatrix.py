@@ -46,15 +46,28 @@ class FCMatrix:
     def get_fc_matrix(self) -> list[FCList]:
         return self._fc_matrix
     
+    def _get_fc_list_head(self, dimension:int) -> FCNode:
+        return self._fc_matrix[dimension - 1].head()
+    
+    def _get_fc_list_tail(self, dimension:int) -> FCNode:
+        return self._fc_matrix[dimension - 1].tail()
+        
+    
     ############################### Query Methods ##############################
     def target_node(self, current_node: FCNode, target_data:L, target_dim:int) -> bool:
-
         return current_node is not None and \
             current_node.loc() == target_data and \
                 current_node.dim() == target_dim == current_node.base_dim()
     
     def fc_matrix_search(self, x:L) -> dict[int, FCNode]:
-        
+        """
+        Find FCNodes located at x (or its successor) in each dimension.
+
+        Args: x (L): Location for which we are searching in each dimension.
+
+        Returns: dict[int, FCNode]: key -> dimension
+                                    pair -> associated FCNode   """
+                                    
         data_locations = {} # type: dict[int, tuple[FCNode, int]]
         target_dim = 1
         
@@ -63,19 +76,20 @@ class FCMatrix:
         #    (Remaining levels are linked lists.)
         cur_node, _ = search_nodes(self._first_dim_list, x)
 
-        # Walk through promoted node pointers, from list 2' until list k'
+        # Walk through promoted node pointers, from list 2' through list (k-1)'
         while target_dim < self._k:
             
             # Ensure x_obj is in the correct dimension. If not check neighbors
             if cur_node.base_dim() != target_dim:
-                print("H1")
+
                 # Because cur_node is not originally from the current dimension,
                 # prev_fc_node and nex_fc_node are guaranteed to be.
                 prev_fc_node = cur_node.prev_foreign_neighbor()
                 next_fc_node = cur_node.next_foreign_neighbor()
                 if self.target_node(prev_fc_node, x, target_dim):
                     cur_node = prev_fc_node
-                    print("H2")
+
+                    print(cur_node)
                     
                 # These cases are for when we are looking for a value expected
                 # in each dimension st. seccessors and predecessors are
@@ -84,25 +98,34 @@ class FCMatrix:
                 ################################################################
                 elif self.target_node(next_fc_node, x, target_dim):
                     cur_node = next_fc_node
-                    print("H3")
+
                 else:
-                    raise Exception("Node of correct dimension not found in" + \
-                        " the augmented list representing the first dimension.")
+                    raise NodeNotFoundInCorrectDimension(target_dim)
                 ################################################################
                 # cur_node = next_fc_node
-            print("H4")
+                ################################################################
+                
             if self._k < self._n_limit:
                 data_locations[target_dim] = cur_node
             
-            # Now, we have correct version of our target in the current dimension.
-            # In order to find it in the next-higher dimension, we must use the
-            # range bounded by (guaranteed foreign) prev_foreign_neighbor and 
-            # prev_foreign_neighbor.
-            low_range = cur_node.prev_foreign_neighbor().prev_dim_variant()
-            high_range = cur_node.next_foreign_neighbor().prev_dim_variant()
+            # cur_node is now the correct version of x (initially of the the 
+            # current dimension). Now, in order to find the version of x
+            # local to the prior dimension, we must use the range bounded by its 
+            # (guaranteed foreign) prev_foreign_neighbor and 
+            # prev_foreign_neighbor. If either doesn't exist, use the head/tail 
+            # of the linked lists of the prior dimension.
             target_dim += 1
             found = False
-            while low_range is not high_range:
+            
+            low_range = self._get_fc_list_head(target_dim) if \
+                cur_node.prev_foreign_neighbor() is None else \
+                    cur_node.prev_foreign_neighbor().prev_dim_variant()
+                    
+            high_range = self._get_fc_list_tail(target_dim) if \
+                cur_node.next_foreign_neighbor() is None else \
+                    cur_node.next_foreign_neighbor().prev_dim_variant()
+                    
+            while low_range.loc() <= high_range.loc():
                 if self.target_node(low_range, x, target_dim):
                     cur_node = low_range
                     found = True
@@ -110,7 +133,7 @@ class FCMatrix:
                 low_range = low_range.next_list_neighbor()
                 
             if not found:
-                raise NodeNotFoundInCorrectDimension()
+                raise NodeNotFoundInCorrectDimension(target_dim)
             
 
         return data_locations
@@ -138,24 +161,29 @@ class FCMatrix:
     
     ########################### Matrix Setup Methods ###########################
     def _build_fractional_cascading_matrix(self):
-        if self._demo:
-            print("Instantiating (not-yet) FCNodes from data_set.")
+        """
+        1. Convert given nodes into FCNodes prior to promotion/augmentation.
+           Note: this conversion is from an indexed list to a linked list.
+        
+        2. Walking from the highest dimension to the lowest, merge elements from
+           the augmented list of the prior dimension and elements of the current 
+           dimension into the augmented list of the current dimension.  """
+        
+        if self._demo: 
+            print("Converting input into (not-yet-promoted) FCNodes.")
 
-        # SingleDimNodes -> FCNodes
+        # 1. SingleDimNodes -> FCNodes
         for i in range(self._k):
             this_FCList = self._fc_matrix[i]
             for j in range(self._n):
                 this_FCList.append(
-                    FCNode(base_node=self._input_data[i][j], dimension=i + 1))                
+                    FCNode(base_node=self._input_data[i][j], dimension=i+1))
         
-        # Begin transformation
-        if self._demo:
-            print("Performing Fractional Cascading pre-process on FCNode matrix.")
-        
-        # Walk through linked lists in reverse order starting at index k-2
+        # 2. Walk through linked lists in reverse order starting at index k-2
         # -> (TBC - walking through actual linked lists in order but through 
         #     list containing linked lists in reverse order.)
         # -> Always promoting from the previous demension
+        if self._demo: print("Pre-processing FCNodes into matrix.")
         for i in reversed(range(self._k - 1)):
             self._fc_matrix[i] = \
                 self._build_augmented_list(self._fc_matrix[i],
@@ -183,9 +211,8 @@ class FCMatrix:
             Augmented list i' containing all values from input dimension i and
             half of the values from dimension (i-1)'    """
             
-            
-        _last_promoted_node = None   # type: FCNode
-        _last_local_node = None      # type: FCNode
+        _last_promoted_node_stack = []  # type: list[FCNode]
+        _last_local_node_stack = []     # type: list[FCNode]
         def _assign_pointers(cur_node:FCNode) -> None:
             """
             Nested method to assign pointers between promoted and local nodes,
@@ -195,23 +222,42 @@ class FCMatrix:
                 FCNode to which we should assign neighbors originally of other 
                 dimensions.  
             """
-            nonlocal _last_promoted_node
-            nonlocal _last_local_node
+            nonlocal _last_promoted_node_stack
+            nonlocal _last_local_node_stack
             
             if cur_node.is_promoted():
-                # Assign prev & next FC neighbors to closest non-promoted nodes.
-                _last_promoted_node = cur_node
-                cur_node.set_prev_f_neighbor(_last_local_node)
-                if _last_local_node is not None:
-                    if _last_local_node.next_foreign_neighbor() is None:
-                        _last_local_node.set_next_f_neighbor(cur_node)
+                # Assign prev & next FC neighbors to closest local nodes.
+                _last_promoted_node_stack.append(cur_node)
+                
+                last_local_node = _last_local_node_stack.pop() if \
+                    len(_last_local_node_stack) > 0 else None
+                
+                cur_node.set_prev_f_neighbor(last_local_node)
+                while last_local_node is not None:
+                    # Assign next pointers until _last_local_node_stack is empty.
+                    if last_local_node.next_foreign_neighbor() is None:
+                        last_local_node.set_next_f_neighbor(cur_node)
                         
-            else:   # Assign prev & next FC neighbors to closest promoted nodes.
-                _last_local_node = cur_node
-                cur_node.set_prev_f_neighbor(_last_promoted_node)
-                if _last_promoted_node is not None:
-                    if _last_promoted_node.next_foreign_neighbor is None:
-                        _last_promoted_node.set_next_f_neighbor(cur_node)
+                    last_local_node = _last_local_node_stack.pop() if \
+                        len(_last_local_node_stack) > 0 else None
+                        
+            elif cur_node.is_local():
+                # Assign prev & next FC neighbors to closest promoted nodes.
+                _last_local_node_stack.append(cur_node)
+                
+                last_promoted_node = _last_promoted_node_stack.pop() if \
+                    len(_last_promoted_node_stack) > 0 else None
+                
+                cur_node.set_prev_f_neighbor(last_promoted_node)
+                while last_promoted_node is not None:
+                    # Assign next pointers until _last_promoted_node_stack is empty.
+                    if last_promoted_node.next_foreign_neighbor() is None:
+                        last_promoted_node.set_next_f_neighbor(cur_node)
+                        
+                    last_promoted_node = _last_promoted_node_stack.pop() if \
+                        len(_last_promoted_node_stack) > 0 else None
+            else:
+                raise Exception("Well this shouldn't be happening :/")
         
         if self._demo:
             dim = node_list_i.head().dim()
@@ -222,28 +268,37 @@ class FCMatrix:
         nodes_to_promote = node_list_j.get_promoted_subset()
         
         # Perform transformation
-        list_i_pointer, promoting_pointer = node_list_i.head(), nodes_to_promote.head()
+        list_i_pointer = node_list_i.head()
+        promoting_pointer = nodes_to_promote.head()
         
         # -> Merge elements from nodes_to_promote and node_list_i into nodes_i_prime
         # -> For each FCNode, assign pointers to all relevant foreign/local FCNodes
         while list_i_pointer is not None and promoting_pointer is not None:
-            if list_i_pointer < promoting_pointer:
+            if list_i_pointer <= promoting_pointer:
                 nodes_i_prime.append(list_i_pointer)
                 list_i_pointer = list_i_pointer.next_list_neighbor()
-            else:
+            elif list_i_pointer > promoting_pointer:
                 nodes_i_prime.append(promoting_pointer)
                 promoting_pointer = promoting_pointer.next_list_neighbor()
-            _assign_pointers(nodes_i_prime.tail())
+            else:
+                raise Exception("Well this shouldn't be happening :/")
+            
+            # _assign_pointers(nodes_i_prime.tail())
         
         # Take leftovers to go.
         while list_i_pointer is not None:
             nodes_i_prime.append(list_i_pointer)
-            _assign_pointers(nodes_i_prime.tail())
+            # _assign_pointers(nodes_i_prime.tail())
             list_i_pointer = list_i_pointer.next_list_neighbor()
         
         while promoting_pointer is not None:
             nodes_i_prime.append(promoting_pointer)
-            _assign_pointers(nodes_i_prime.tail())        
+            # _assign_pointers(nodes_i_prime.tail())        
             promoting_pointer = promoting_pointer.next_list_neighbor()
+            
+        augmented_pointer = nodes_i_prime.head()
+        while augmented_pointer is not None:
+            _assign_pointers(augmented_pointer)
+            augmented_pointer = augmented_pointer.next_list_neighbor()
             
         return nodes_i_prime

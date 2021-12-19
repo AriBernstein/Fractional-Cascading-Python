@@ -44,7 +44,9 @@ class FCNode:
             neighbor respectively in the linked list.
             
         _l_f_neighbor, (FCNode), _r_f_neighbor (FCNode):
-            l_f_n... -> left_foreign_neighbor, r_f_n...-> right_forign_neighbor.
+            _l_f_neighbor -> left_foreign_neighbor
+            _r_f_neighbor -> right_forign_neighbor.
+            
             Nodes in fractional cascading data structures store pointers to the 
             nearest preceding and proceeding nodes in the current dimension with 
             opposite promotional statuses to the current.   """
@@ -89,7 +91,7 @@ class FCNode:
         during node promotion.)  """
         return self._l_list_neighbor
     
-    def set_prev_neighbor(self, new_prev:'FCNode') -> None:
+    def set_prev_list_neighbor(self, new_prev:'FCNode') -> None:
         self._l_list_neighbor = new_prev
     
     def next_list_neighbor(self) -> 'FCNode':
@@ -116,8 +118,8 @@ class FCNode:
         from the original dimension stored in _base_node. of this instance. """
         return self._r_f_neighbor
     
-    def set_next_f_neighbor(self, right_fc_neighbor:'FCNode') -> None:
-        self._r_f_neighbor = right_fc_neighbor
+    def set_next_f_neighbor(self, right_foreign_neighbor:'FCNode') -> None:
+        self._r_f_neighbor = right_foreign_neighbor
     
     def copy(self) -> 'FCNode':
         """
@@ -176,14 +178,16 @@ class FCNode:
             cur_dim_label = 'x' if self._cur_dim == 1 else 'y' \
                 if self._cur_dim == 2 else 'z'
         
-        return f"(Cur Dim: {cur_dim_label}, Base {self.base_node()})"
+        # return f"(Cur Dim: {cur_dim_label}, Base {self.base_node()})"
+        return f"(C Dim: {cur_dim_label}, B {self.base_node()})"
+
     
     def __repr__(self) -> str:
         return str(self)
     
     # NOTE: These do not consider dimensionality of the base_node and may as 
     #       such equate two items as equal when the base nodes contain the same
-    #       value but are of different dimensions.
+    #       value but are of different initial dimensions.
     def __eq__(self, __o: object) -> bool:
         return self.current_dim() == __o.current_dim() and \
             self._base_node.loc() == __o.base_node().loc() \
@@ -250,28 +254,15 @@ class FCList:
         """
         Append fc_node to the (right) end of the linked list. Update the tail.
         
-        Args fc_node (FCNode): Node to append.  """
+        Args: fc_node (FCNode): Node to append.  """
         if self._n == 0:
             self._list_head = self._list_tail = fc_node
         else:            
             self._list_tail.set_next_list_neighbor(fc_node)
-            fc_node.set_prev_neighbor(self._list_tail)
+            fc_node.set_prev_list_neighbor(self._list_tail)
             self._list_tail = fc_node
         self._n += 1
     
-    def append_left(self, fc_node:FCNode) -> None:
-        """
-        Append fc_node to the left end of the linked list. Update the head.
-        
-        Args fc_node (FCNode): Node to append.  """
-        if self._n == 0:
-            self._list_head = self._list_tail = fc_node
-        else:
-            self._list_head.set_prev_neighbor(fc_node)
-            fc_node.set_next_list_neighbor(self._list_head)
-            self._list_head = fc_node
-        self._n += 1
-        
     def get_promoted_subset(self) -> 'FCList':
         """
         Returns: FCList: 
